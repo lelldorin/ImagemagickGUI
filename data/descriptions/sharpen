@@ -1,0 +1,3 @@
+convert -sharpen factor input output
+
+sharpen an image. Specify factor as the percent enhancement (0.0 - 99.9%).

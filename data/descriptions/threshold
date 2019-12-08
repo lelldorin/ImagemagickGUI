@@ -1,0 +1,3 @@
+convert -threshold percent input ouput
+
+The threshold transformation limits the maximum value for all channels.

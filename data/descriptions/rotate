@@ -1,0 +1,5 @@
+convert -rotate degrees input output
+
+apply Paeth image rotation to the image.
+
+Empty triangles left over from rotating the image are filled with the color defined as bordercolor (class borderColor). See X(1) for details.

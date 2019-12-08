@@ -1,0 +1,3 @@
+convert -flip input output
+
+create a "mirror image" by reflecting the scanlines in the vertical direction.

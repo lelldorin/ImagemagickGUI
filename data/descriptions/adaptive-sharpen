@@ -1,0 +1,5 @@
+mogrify -adaptive-sharpen Radius x Sigma output
+
+Adaptively sharpen pixels, with increasing effect near edges.
+
+A Gaussian operator of the given radius and standard deviation (sigma) is used. If sigma is not given it defaults to 1.

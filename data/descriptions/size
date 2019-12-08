@@ -1,0 +1,12 @@
+convert -size Width(%) x Height (%) + Colordepth output
+
+width and height of the image.
+
+Use this option to specify the width and height of raw images whose dimensions are unknown such as GRAY, RGB, or CMYK. In addition to width and height, use -size to skip any header information in the image or tell the number of colors in a MAP image file, (e.g. -size 640x512+256).
+
+For Photo CD images, choose from these sizes:
+   192x128
+   384x256
+   768x512
+   1536x1024
+   3072x2048

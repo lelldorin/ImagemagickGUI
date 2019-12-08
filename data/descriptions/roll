@@ -1,0 +1,5 @@
+mogrify -roll (+/-)X,(+/-)Y output
+
+roll an image vertically or horizontally. 
+
+A negative x offset rolls the image left-to-right. A negative y offset rolls the image top-to-bottom.

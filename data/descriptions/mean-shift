@@ -1,0 +1,5 @@
+mogrify -mean-shift Width x Height + Distance (%) output
+
+image noise removal and color reduction/segmentation (e.g. -mean-shift 7x7+10%).
+
+widthxheight is the window size and distance is the color distance measured in the range 0 to 1 or 0 to 100%

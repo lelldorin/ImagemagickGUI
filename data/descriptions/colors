@@ -1,0 +1,5 @@
+conver -colors value input output
+
+convert image into colors (value)
+
+value is a number between 1 and 256 

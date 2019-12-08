@@ -1,0 +1,4 @@
+Level of gamma correction.
+
+The same color image displayed on two different workstations may look different due to differences in the display monitor. Use gamma correction to adjust for this color difference. Reasonable values extend from 0.8 to 2.3.
+You can apply separate gamma values to the red, green, and blue channels of the image with a gamma value list delineated with commas (i.e. 1.7,2.3,1.2).

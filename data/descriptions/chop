@@ -1,0 +1,6 @@
+convert -chop X x Y + Column + Row input output
+
+Chop removes comlumns and rows drom a image file.
+
+- x and y are the size of the portionof the image file t remove.
+- column and row are the location to remove

@@ -1,0 +1,6 @@
+convert -selective-blur radius output
+convert -selective-blur Radius x Sigma + Threshold output
+
+Selectively blur pixels within a contrast threshold.
+
+Blurs those pixels that are less than or equal to the threshold in contrast. The threshold may be expressed as a fraction of QuantumRange or as a percentage.

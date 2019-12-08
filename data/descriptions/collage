@@ -1,0 +1,10 @@
+montage -geometry (+/-)X(+/-)Y -tile XxY /path/to/picture/*.jpg output
+
+Created a photo collage with the distance between the photos of "geometry" (+/-)x (+/-)y and the division of the photos into 
+lines x rows.
+
+You must select the folder with the photos and specify the name of the photos and their file suffix (all images must be numbered). Instead of the picture number, a * must be entered. Here the script automatically inserts the numbers to add them to the collage.
+
+Example:
+
+montage -geometry +10+10 -tile 4x2 /boot/home/picture*.jpg /boot/home/collage.jpg

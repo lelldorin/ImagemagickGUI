@@ -1,0 +1,3 @@
+mogrify -solarize factor output
+
+negate all pixels above the threshold level. Specify factor as the percent threshold of the intensity (0 - 99.9%).

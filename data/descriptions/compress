@@ -1,0 +1,13 @@
+convert -compress type
+
+compressing image with type of compressor
+
+BZip
+Fax (CCITT Group 3 fax compressing)
+Group4 (CCITT Group4 fax compressing)
+JPEG
+JPEG2000
+Lossless (lossless JPEG)
+LZW
+RLE (run-lenght encoding)
+Zip (deflate compressing)

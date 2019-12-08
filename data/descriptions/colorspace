@@ -1,0 +1,7 @@
+convert -colorspace type output
+
+type of colorspace: GRAY, HSL, OHTA, RGB, XYZ, YCbCr, YIQ, YPbPr, or YUV.
+
+Color reduction, by default, takes place in the RGB color space. Empirical evidence suggests that distances in color spaces such as YUV or YIQ correspond to perceptual color differences more closely than do distances in RGB space. These color spaces may give better results when color reducing an image. Refer to quantize for more details.
+
+The Transparent color space behaves uniquely in that it perserves the matte channel of the image if it exists.

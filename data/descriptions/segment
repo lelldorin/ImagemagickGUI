@@ -1,0 +1,3 @@
+convert -segment clustering_threshold x smoothing_threshold input ouput
+
+The segment transformation uses histrograms of each color component to determine which colors are homogenous, and then it combines those colors.

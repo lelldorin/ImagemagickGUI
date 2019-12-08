@@ -1,0 +1,3 @@
+mogrify -colorize
+
+colorize the image with the pen color

@@ -1,0 +1,3 @@
+convert (+/-)distort Plane2Cylinder Angle input output
+
+The 'Plane2Cylinder' distort is the reverse 'Cylinder2Plane'

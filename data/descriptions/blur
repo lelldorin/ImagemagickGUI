@@ -1,0 +1,16 @@
+conver -blur factor input output
+
+blurs an image. Specify factor as the percent enhancement (0.0 - 99.9%).
+
+
+------------
+
+Blur/Gaussian Arguments
+
+The arguments for "-blur" and "-gaussian-blur" are the same, but to someone new to image processing, the argument values can be confusing.
+
+     -blur  {radius}x{sigma} 
+
+The important setting in the above is the second sigma value. It can be thought of as an approximation of just how much your want the image to 'spread' or blur, in pixels. Think of it as the size of the brush used to blur the image. The numbers are floating point values, so you can use a very small value like '0.5'.
+
+The first value radius, is also important as it controls how big an area the operator should look at when spreading pixels. This value should typically be either '0' or at a minimum double that of the sigma.

@@ -1,0 +1,3 @@
+convert -colorspace gray input output
+
+converts a colored image to grayscale

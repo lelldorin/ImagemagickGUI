@@ -1,0 +1,5 @@
+mogrify -spread amount output
+
+displace image pixels by a random amount.
+
+Amount defines the size of the neighborhood around each pixel to choose a candidate pixel to swap.

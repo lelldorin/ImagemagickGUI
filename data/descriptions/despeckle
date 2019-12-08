@@ -1,0 +1,3 @@
+mogrify -despeckle
+
+reduce the speckles within an image.

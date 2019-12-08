@@ -1,0 +1,3 @@
+conver -thumbnail percent(%) input ouput
+
+Create a thumbnail by a size of percent(%) of the input image

@@ -1,0 +1,5 @@
+convert -negate input output
+
+apply color inversion to image.
+
+The red, green, and blue intensities of an image are negated.

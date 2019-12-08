@@ -1,0 +1,3 @@
+covert -scale widthxheight input ouput
+
+scale a image to a new size

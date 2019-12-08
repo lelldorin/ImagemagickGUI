@@ -1,0 +1,3 @@
+convert -resample Width x Height input output
+
+uses as parameter the desired XxY resolution, not the XxY pixel geometry of the target image. The purpose of this operator is to preserve the rendered size of an image: Assume your image measures 4 inches by 3 inches on a device that renders it at 300 DPI. Then asking for a -resample 72 or -resample 72x72 will resize the image so that it measures (again) 4 inches by 3 inches on a 72 DPI device.

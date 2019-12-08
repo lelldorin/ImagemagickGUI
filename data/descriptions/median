@@ -1,0 +1,5 @@
+mogrify -median geometry output
+
+apply a median filter to the image.
+
+Select the 'middle' value from all the surrounding pixels.

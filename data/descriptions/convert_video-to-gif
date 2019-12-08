@@ -1,0 +1,7 @@
+convert -quiet -delay 1 input (AVI/MP4) output.gif
+
+convert a AVI or MP4 movie into a GIF animation
+
+Notice that a GIF animation has a much bigger file size like a video file, so make sure you have enough free disk space for it!
+
+For example, my test AVi video are 15.52 MiB and the output GIG animation are 71.76 MiB.

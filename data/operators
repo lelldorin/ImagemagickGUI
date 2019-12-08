@@ -1,0 +1,89 @@
+Align|auto-orient|-auto-orient
+Align|flip|-flip
+Align|flop|-flop
+Align|gravity|-gravity NorthEast
+Align|gravity|-gravity NorthWest
+Align|gravity|-gravity SouthEast
+Align|gravity|-gravity SouthWest
+Align|orient|-orient orientation
+Align|rotate|-rotate degrees
+Blurring|adaptive-blur|-adaptive-blur radius x sigma
+Blurring|blur|-blur factor
+Blurring|gaussian-blur|-gaussian-blur radius x sigma
+Blurring|motion-blur|-motion-blur radius x sigma + angle
+Blurring|radial-blur|-radial-blur angle
+Blurring|selective-blur|-selective-blur radius x sigma + threshold
+Blurring|unsharp|-unsharp radius x sigma + amount + threshold
+Colors|auto-gamma|-auto-gamma
+Colors|auto-level|-auto-level
+Colors|colorize|-colorize r,g,b
+Colors|colors|-colors value
+Colors|colorspace|-colorspace type
+Colors|gamma|-gamma value
+Colors|interlace|-interlace type
+Colors|mean-shift|-mean-shift width x height + distance
+Colors|normalize|-normalize
+Contrast|brightness-contrast|-brightness-contrast brightness x contrast
+Contrast|contrast -|-contrast 
+Contrast|contrast +|+contrast 
+Contrast|contrast-stretch|-contrast-stretch black-point x white-point
+Contrast|level|-level whitpoint(%), blackpoint(%)
+Contrast|sigmoidal-contrast -|-sigmoidal-contrast value x percent
+Contrast|sigmoidal-contrast +|+sigmoidal-contrast value x percent
+Effects|append horizontal|+append
+Effects|append vertical|-append
+Effects|border|-border width x height
+Effects|charcoal|-channel type
+Effects|chop|-chop x x y + column + row
+Effects|cycle|-cycle amount
+Effects|despeckle|-despeckle
+Effects|distort|Affine
+Effects|distort|Arc
+Effects|distort|Barrel
+Effects|distort|DePolar
+Effects|distort|Plane2Cylinder value
+Effects|distort|Polar
+Effects|distort|Shepards
+Effects|distort|SRT
+Effects|edge|-edge factor
+Effects|emboss|-emboss radius x sigma
+Effects|enhance|-enhance
+Effects|equalize|-equalize
+Effects|implode|-implode amount
+Effects|kuwahara|-kuwahara radius x sigma
+Effects|loop|-loop value
+Effects|median|-median geometry
+Effects|modulate|-modulate value1, value2, hue
+Effects|monochrome|-monochrome
+Effects|negate|-negate
+Effects|ordered-dither|-ordered-dither threshold_map
+Effects|paint|-paint radius
+Effects|polaroid|-polaroid angle
+Effects|raise|-raise x x y
+Effects|roll|-roll x,y
+Effects|segment|-segment clustering_threshold x smoothing_threshold
+Effects|sepia-tone|-sepia-tone percent-threshold
+Effects|shade|-shade azimuth x elevation
+Effects|shear|-shear x x y
+Effects|sketch|-colorspace gray -sketch radius x sigma + angle
+Effects|solarize|-solarize factor
+Effects|spread|-spread amount
+Effects|swirl|-swirl degrees
+Effects|threshold -threshold percent
+Effects|vignette|-background "rgb(r,g,b)"-vignette x,y
+Effects|wave|-wave amplitude x wavelength
+Effects|wavelet-denoise|-wavelet-denoise threshold x softness
+Parameters|splice|-splice x x y
+Sharping|adaptive-sharpen|-adaptive-sharpen radius x sigma
+Sharping|gaussian-noise|-evaluate Gaussian-noise value
+Sharping|noise|-noise value
+Sharping|sharpen|-sharpen factor
+Size|compress|-compress type
+Size|crop|-crop percent
+Size|magnify|-magnify
+Size|resample|-resample width x height
+Size|resize|-resize width x height
+Size|scale|-scale width x height 
+Size|shave|-shave x x y
+Size|size|-size width x height + colordepth
+Size|trim|-trim

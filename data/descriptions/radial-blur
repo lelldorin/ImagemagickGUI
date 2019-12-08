@@ -1,0 +1,3 @@
+convert -radial-blur angle input output
+
+Blur around the center of the image.

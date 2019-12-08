@@ -1,0 +1,8 @@
+mogrify -contrast-stretch black-point output
+mogrify -contrast-stretch black-point x white-point % output
+
+Increase the contrast in an image by stretching the range of intensity values.
+
+While performing the stretch, black-out at most black-point pixels and white-out at most white-point pixels. Or, if percent is used, black-out at most black-point % pixels and white-out at most white-point % pixels.
+
+Note that -contrast-stretch 0 will modify the image such that the image's min and max values are stretched to 0 and QuantumRange, respectively, without any loss of data due to burn-out or clipping at either end. This is not the same as -normalize, which is equivalent to -contrast-stretch 0.15x0.05% (or prior to ImageMagick 6.4.7-0, -contrast-stretch 2%x99%).

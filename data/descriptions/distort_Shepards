@@ -1,0 +1,4 @@
+convert (+/-)distort Shepards 'Positon1,New_Position1 Position2,New_Position2' input output
+
+Shepard's method  uses the movement of the given control points to distort the image in terms of 'local' effects. 
+Shepards let you move two (or more) given positions (x,y) to a new position (x,y).

@@ -1,0 +1,6 @@
+convert (+/-)append /source/folder/*.suffix output
+
+combine the images taken from sourcefolder and create a new image with all images at each other.
+
++append creates a horizontal image combination
+-append creates a vertical image combination

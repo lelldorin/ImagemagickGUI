@@ -1,0 +1,3 @@
+conver -crop X(%) x Y(%) +repage input output%.jpg
+
+Split a image into tiles. Set the size of tiles using percent information to X and Y

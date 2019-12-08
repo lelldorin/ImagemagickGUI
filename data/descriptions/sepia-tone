@@ -1,0 +1,5 @@
+convert -sepia-tone percent-threshold ouput
+
+simulate a sepia-toned photo.
+
+Specify threshold as the percent threshold of the intensity (0 - 99.9%).

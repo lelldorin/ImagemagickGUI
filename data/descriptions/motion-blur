@@ -1,0 +1,5 @@
+convert -motion-blur Radius x Sigma + Angle output
+
+You can add a linearly fading blur in one direction only (giving a radius and sigma, plus an the angle in which the blur should occur), by using a "-motion-blur".
+
+Note that while "-radial-blur" blurs in both directions, "-motion-blur" only blurs in one direction.

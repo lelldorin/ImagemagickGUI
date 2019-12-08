@@ -1,0 +1,15 @@
+mogrify -orient orientation output
+
+specify orientation of a digital camera image.
+
+Choose from these orientations:
+
+bottom-left   
+bottom-right   
+left-bottom    
+left-top      
+right-bottom
+right-top
+top-left
+top-right
+undefined

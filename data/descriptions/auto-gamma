@@ -1,0 +1,7 @@
+mogrify -auto-gamma output
+
+Automagically adjust gamma level of image.
+
+This calculates the mean values of an image, then applies a calculated -gamma adjustment so that is the mean color exists in the image it will get a have a value of 50%. This means that any solid 'gray' image becomes 50% gray.
+
+This works well for real-life images with little or no extreme dark and light areas, but tend to fail for images with large amounts of bright sky or dark shadows. It also does not work well for diagrams or cartoon like images.

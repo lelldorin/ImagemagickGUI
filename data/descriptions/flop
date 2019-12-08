@@ -1,0 +1,3 @@
+convert -flop input output
+
+create a "mirror image" by reflecting the image scanlines in the horizontal direction.

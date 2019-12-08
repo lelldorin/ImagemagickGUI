@@ -1,0 +1,5 @@
+convert -loop Value input_files*.jpg output.gif
+
+Creates of a list of images a gif animation.
+
+Value stands for the number of times to repeat the animation. Use 0 for endless GIF animation.

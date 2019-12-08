@@ -1,0 +1,3 @@
+convert (+/-)distort Cylinder2Plane Angle input output
+
+The 'Cylinder2Plane' distort is a radial projective distortion from a point in the center of a cylinder to a flat plane that is at a tangent to that cylinder.

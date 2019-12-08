@@ -1,0 +1,8 @@
+convert -crop Percent(%) output
+convert -crop Width(%) x Height(%) (+/-)X (+/-)Y output
+
+preferred size and location of the cropped image. See X(1) for details about the geometry specification.
+
+To specify a percentage width or height instead, append %. For example to crop the image by ten percent on all sides of the image, use -crop 10%.
+
+Use cropping to apply image processing options to, or display, a particular area of an image. Use -crop 0x0 to remove edges that are the background color. Omit the x and y offset to generate one or more subimages of a uniform size.

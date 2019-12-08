@@ -1,0 +1,5 @@
+convert -normalize input output
+
+transform image to span the full range of color values.
+
+This is a contrast enhancement technique.

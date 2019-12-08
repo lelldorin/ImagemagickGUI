@@ -1,0 +1,5 @@
+convert -adaptive-blur radius x sigma input output
+
+Adaptively blur pixels, with decreasing effect near edges.
+
+A Gaussian operator of the given radius and standard deviation (sigma) is used. If sigma is not given it defaults to 1.

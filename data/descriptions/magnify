@@ -1,0 +1,5 @@
+convert -magnify input output
+
+magnify doubles the size of an image, using a technique known as "Pixel Scaling" using the Scale2X algorithm.
+
+It tries to smooth the corners of pixels being enlarged, without adding extra colors.

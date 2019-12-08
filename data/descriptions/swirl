@@ -1,0 +1,3 @@
+mogrify -swirl degrees output
+
+swirl image pixels about the center. Degrees defines the tightness of the swirl.

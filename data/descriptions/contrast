@@ -1,0 +1,5 @@
+convert (-/+)contrast input output
+
+enhance or reduce the image contrast.
+
+This option enhances the intensity differences between the lighter and darker elements of the image. Use -contrast to enhance the image or +contrast to reduce the image contrast.

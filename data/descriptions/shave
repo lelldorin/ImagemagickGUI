@@ -1,0 +1,5 @@
+-shave XxY
+
+Shave, removing edges from a image
+
+If you only want to shave one side, add a 0 for the other side

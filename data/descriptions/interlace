@@ -1,0 +1,3 @@
+convert -interlace type input output
+
+Interlace allows to display an image progressively (For websites).

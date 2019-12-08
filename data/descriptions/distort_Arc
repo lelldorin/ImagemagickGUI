@@ -1,0 +1,3 @@
+convert (+/-)distort Arc 'Angle Rotate' input output
+
+By default "-distort" will usually distort the source image(s) into an image that is the same size as the original image. 

@@ -1,0 +1,5 @@
+mogrify -auto-orient output
+
+adjusts an image so that its orientation is suitable for viewing (i.e. top-left orientation).
+
+This operator reads and resets the EXIF image profile setting 'Orientation' and then performs the appropriate 90 degree rotation on the image to orient the image, for correct viewing.

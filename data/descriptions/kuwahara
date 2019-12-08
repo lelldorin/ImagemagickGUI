@@ -1,0 +1,6 @@
+mogrify -kuwahara radius output
+mogrify -kuwahara radius x sigma output
+
+edge preserving noise reduction filter.
+
+The radius is more important than the sigma. If sigma is left off, it will be computed automatically from the radius as sigma=radius-0.5. The sigma provides a bit of additional smoothing control.

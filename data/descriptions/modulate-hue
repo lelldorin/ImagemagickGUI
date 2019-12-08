@@ -1,0 +1,5 @@
+convert -modulate value1, value2, hue input output
+
+The final value, Hue, is actually much more useful. It rotates the colors of the image, in a cyclic manner. To achieve this the Hue value given produces a 'modulus addition', rather than a multiplication.
+
+However be warned that the hue is rotated using a percentage, and not by an angle. This may seem weird but "-modulate" has always been that way.

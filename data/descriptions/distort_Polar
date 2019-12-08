@@ -1,0 +1,3 @@
+convert -distort Polar Radius_Max Radius_Min Center_X,Center_Y Start_Angle,End_Angle  input output
+
+The 'Polar' distort is a more low level version of the 'Arc' distortion. It will not automatically do 'bestfit', nor does it try to preserve the aspect ratios of images.

@@ -1,0 +1,3 @@
+convert -fuzz percent(%) -trim input output
+
+Trim the image by percent value of operator fuzz

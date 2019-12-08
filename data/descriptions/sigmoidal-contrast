@@ -1,0 +1,3 @@
+conver (+/-)sigmoidal-contrast value x percent% input output
+
+Applies a sigmoidal brightness and/or contrast adjustment to an image.

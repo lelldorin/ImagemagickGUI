@@ -1,0 +1,3 @@
+convert -equalize input output
+
+perform histogram equalization to the image.

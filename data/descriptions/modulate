@@ -1,0 +1,5 @@
+mogrify -modulate value output
+
+vary the brightness, saturation, and hue of an image.
+
+Specify the percent change in brightness, the color saturation, and the hue separated by commas.

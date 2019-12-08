@@ -1,0 +1,3 @@
+mogrify -edge factor output
+
+detect edges within an image. Specify factor as the percent enhancement (0.0 - 99.9%).

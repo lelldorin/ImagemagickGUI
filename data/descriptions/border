@@ -1,0 +1,5 @@
+convert -border width x height input output
+
+surround the image with a border or color. See X(1) for details about the geometry specification.
+
+The color of the border is obtained from the X server and is defined as bordercolor (class borderColor). See X(1) for details.

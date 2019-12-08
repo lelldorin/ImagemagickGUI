@@ -1,0 +1,3 @@
+convert -level whitepoint(%),blackpoint(%) input output
+
+The level option let you specify the black point or white point of the ime by percent.

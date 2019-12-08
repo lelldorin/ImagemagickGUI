@@ -1,0 +1,24 @@
+I found this funny abstract-oil-paint issue online and would be pretty amased to do the same, using ImageMagicGUI, with single steps. You can do all steps and you get the same picture, but it does not switch back to colored view. I dont know why.
+
+Abstract oil paintings
+
+Of course. Basically I do these steps:
+
+* Create a 2x2 pixel grey background.
+* Add rough gaussian noise.
+* Scale up to double size (4x4) using interpolation.
+* Add more gaussian noise (but not quite as powerful.)
+* Scale up to double size (8x8).
+* Add even weaker gaussian noise.
+* Repeat until it is slightly larger than the desired size.
+* Oil paint effect.
+* Crop off the outer 5-10% because of artifacts.
+* Go into the HSL colorspace (this makes the next few manipulations look more cool.)
+* Normalise the "hue" channel so that we get all hues.
+* Normalize the "saturation" channel so that we always have both colorful and colorless areas.
+* Go back to RGB colorspace.
+* Despeckle and then rotate 90 degrees (I can't explain why, but it just looked nice.)
+
+Here's the code:
+
+convert -size 64x64 xc:#707070  -resize 2x2 -evaluate Gaussian-noise 0.152 -resize 4x4 -evaluate Gaussian-noise 0.123 -resize 8x8 -evaluate Gaussian-noise 0.100 -resize 16x16 -evaluate Gaussian-noise 0.081 -resize 32x32 -evaluate Gaussian-noise 0.065 -resize 64x64 -evaluate Gaussian-noise 0.053 -resize 128x128 -evaluate Gaussian-noise 0.043 -resize 256x256 -evaluate Gaussian-noise 0.035 -paint 10 -crop 239x239+0+0 -colorspace HSL -channel lightness -normalize -channel saturation -normalize -colorspace RGB -despeckle -rotate 90 "abstract.jpg"

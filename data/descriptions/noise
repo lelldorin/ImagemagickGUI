@@ -1,0 +1,3 @@
+Reduce the noise in an image with a noise peak elimination filter.
+
+The principal function of noise peak elimination filter is to smooth the objects within an image without losing edge information and without creating undesired structures. The central idea of the algorithm is to replace a pixel with its next neighbor in value within a 3 x 3 window, if this pixel has been found to be noise. A pixel is defined as noise if and only if this pixel is a maximum or minimum within the 3 x 3 window.

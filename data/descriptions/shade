@@ -1,0 +1,5 @@
+convert -shade Azimuth x Elevation output
+
+shade the image using a distant light source.
+
+Specify azimuth and elevation as the position of the light source. Use +shade to return the shading results as a grayscale image.

@@ -1,0 +1,3 @@
+convert -monochrome input output
+
+transform the image to black and white.

@@ -1,0 +1,4 @@
+mogrify -wave amplitude output
+mogrify -wave amplitude x wavelength output
+
+Shear the columns of an image into a sine wave.

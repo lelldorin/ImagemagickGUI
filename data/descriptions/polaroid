@@ -1,0 +1,5 @@
+mogrify -polaroid angle output
+
+simulate a Polaroid picture.
+
+Use +polaroid to rotate the image at a random angle between -15 and +15 degrees.

@@ -1,0 +1,6 @@
+convert (+/-)distort Barrel 'A B C D' input output
+
+The Barrel Distortion is designed specifically for correcting the spherical distortions caused by camera lenses in photos. That is distortions such as barrel and pincushion effects, which are effectively the reverse of each other.
+
+The arguments needed for the 'Barrel' distort method. Generally you supply 3 or 4 values only...
+A   B   C   [ D   [ X , Y ] ]

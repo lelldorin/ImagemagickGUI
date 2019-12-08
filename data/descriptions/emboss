@@ -1,0 +1,3 @@
+Emboss, creating a metallic impression
+
+The "-emboss" operator tries to generate the effect of a acid impression of a grey-scale image on a sheet of metal. It is in many respects very similar to the "-shade" operator we will look at below, but without the 3D looking edges.

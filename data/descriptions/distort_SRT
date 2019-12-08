@@ -1,0 +1,11 @@
+convert (+/-)distort SRT 'X,Y ScaleX,ScaleY Angle NewX,NewY' input output
+
+By default "-distort" will usually distort the source image(s) into an image that is the same size as the original image. 
+
+							  Angle  				" -> centered rotate
+				 Scale   		  Angle				" -> centered scale and rotate
+			X,Y 				  Angle 				" -> rotate about given coordinate
+-distort SRT " 	X,Y     Scale     		  Angle				" -> scale and rotate about coordinate	
+                  		X,Y 	 ScaleX,ScaleY 	  Angle				" -> dito
+			X,Y     Scale     		  Angle  	NewX,NewY	" -> scale, rotate and translate coord
+			X,Y 	ScaleX,ScaleY 	  Angle  	NewX,NewY	" -> dito

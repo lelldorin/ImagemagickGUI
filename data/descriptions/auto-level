@@ -1,0 +1,5 @@
+mogrify -auto-level output
+
+Automagically adjust color levels of image.
+
+This is a 'perfect' image normalization operator. It finds the exact minimum and maximum color values in the image and then applies a -level operator to stretch the values to the full range of values.

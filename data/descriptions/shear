@@ -1,0 +1,3 @@
+mogrify -shear <x> x <y> output
+
+shear the image along the X or Y axis by a positive or negative shear angle.
