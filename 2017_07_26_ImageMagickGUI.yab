@@ -1,0 +1,4109 @@
+#!/boot/system/bin/yab
+REM Requires yab v 1.7
+REM Start of Creating 2017-06-08
+REM Build Date: 
+REM Copyright by Christian Albrecht, BeSly Software Solutions
+REM Developer: Christian Albrecht
+
+Version$="0.9.4"
+BuildDate$="2017-07-26"
+Developer$="Christian Albrecht (Lelldorin)"
+
+ProgramName$="ImageMagick GUI"
+ProgramID$="ImageMagickGUI"
+
+//Program directory
+if (peek("isbound")) then
+	ProgramFolder$ = peek$("directory")
+else
+	ProgramFolder$ = system$("pwd")
+	ProgramFolder$ = left$(ProgramFolder$, len(ProgramFolder$)-1)
+fi
+
+if(IfExists("/boot/home/config/settings/.besly")) then
+else
+	Output$=System$("mkdir /boot/home/config/settings/.besly")
+endif
+
+if(IfExists("/boot/home/config/settings/.besly/ImageMagickGUI")) then
+	TempFolder$="/boot/home/config/settings/.besly/ImageMagickGUI/temp"
+	x=0
+	i=0
+	Readtempfolder$=system$("ls -G -1 /boot/home/config/settings/.besly/ImageMagickGUI/temp")
+		dim SplitDirEntries$(1)
+			x = split(Readtempfolder$, SplitDirEntries$(), "\n")
+			for i = i to x-1
+				if(SplitDirEntries$(i)="")then
+				else
+					Output$=System$("rm -r  /boot/home/config/settings/.besly/ImageMagickGUI/temp/"+trim$(SplitDirEntries$(i)))
+				endif
+			next i
+			wait 0.5
+else
+	Output$=System$("mkdir /boot/home/config/settings/.besly/ImageMagickGUI")
+	Output$=System$("mkdir /boot/home/config/settings/.besly/ImageMagickGUI/temp")
+	Output$=System$("mkdir /boot/home/config/settings/.besly/ImageMagickGUI/templates")
+	TempFolder$="/boot/home/config/settings/.besly/ImageMagickGUI/temp"	
+endif
+
+if(IfExists("/boot/home/config/settings/.besly/ImageMagickGUI/templates")) then
+	TemplatesFolder$="/boot/home/config/settings/.besly/ImageMagickGUI/templates"
+else
+	Output$=System$("mkdir /boot/home/config/settings/.besly/ImageMagickGUI/templates")
+	TemplatesFolder$="/boot/home/config/settings/.besly/ImageMagickGUI/templates"
+endif
+
+
+
+
+Previewfile$=TempFolder$+"/preview"
+undo=0
+
+
+//Global Variables
+screenWidth = peek("desktopwidth")
+screenHeight = peek("desktopheight")
+BitmapSize=510
+ScreenSizeWidth=1024
+ScreenSizeHeight=740
+
+MainWindow()
+
+	
+	
+//Main Loop
+dim part$(1)
+inloop = true
+while(inloop)
+	//General Messages
+	msg$ = message$
+	if (split(msg$, part$(), ":|") > 2) then
+		PartOne$=part$(1)
+		PartTwo$ = part$(2)
+		PartThree$ = part$(3)
+	fi
+	if (split(msg$, part$(), ":|") > 3) then
+		PartFour$ = part$(4)
+	fi
+	if (split(msg$, part$(), ":|") > 4) then
+		PartFife$ = part$(5)
+	fi
+	if (msg$ <> "") print msg$
+	
+	switch msg$
+	
+	case "VI_Menu1:App:About|"
+		ALERT "ImageMagickGUI\n\nVersion: "+Version$+" - "+BuildDate$+"\nDeveloper: "+Developer$+"\nLicense: Artistic\n\nImageMagick is a powerful comand line program for manipulating images.\n\nWith this program you have the possibility to use various functions of ImageMagick.\n\nThe real strength of ImageMagick is, however, the combination of these functions, for which it requires a great deal of experience. So if you want more, then it is necessary to familiarize yourself with ImageMagick on the comand line.\n", "Ok", "info"
+		break
+	
+	case "VI_Menu1:App:Quit|"
+	case ProgramID$+":_QuitRequested|"
+		WINDOW CLOSE ProgramID$
+		break		
+		
+	//Help
+	case "VI_Menu1:Help:Websites:"+PartFour$+"|"
+		if(PartFour$="ImageMagick")then
+			LAUNCH "http://www.imagemagick.org"
+		elseif(PartFour$="BeSly knowledge base")then
+			LAUNCH "http://www.besly.de"
+		elseif(PartFour$="BeSly Software Solutions")then
+			LAUNCH "http://software.besly.de"
+		endif
+		break	
+	
+	case "VI_Menu1:Help:Forums:"+PartFour$+"|"
+		if(PartFour$="ImageMagick")then
+			LAUNCH "https://www.imagemagick.org/discourse-server"
+		elseif(PartFour$="Forums BeSly knowledge base")then
+			LAUNCH "http://f.besly.de"
+		endif
+		break	
+	
+	case "VI_ImageRight:_Dropped:"+PartThree$+"|"
+	case "VI_ImageLeft:_Dropped:"+PartThree$+"|"
+		if(right$(PartThree$,3)="avi")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="AVI")then		
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="mp3")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="MP3")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="mp4")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="MP4")then	
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="wmv")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="WMV")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="3gp")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="3GP")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="mov")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="MOV")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="exe")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="EXE")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="pdf")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,3)="PDF")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,4)="hpkg")then
+			ALERT "Not supported format", "Ok", "stop"
+		elseif(right$(PartThree$,4)="HPKG")then
+			ALERT "Not supported format", "Ok", "stop"
+		else
+			Info$="Loading image..."
+			Info()
+			if(undo=0)then
+			else
+				i=0
+				for i = 1 to undo
+					Output$=System$("rm -r  "+TempFolder$+"/undo"+str$(i))
+				next i
+				undo=0
+			endif
+			n=0
+			i=0
+			File$=""
+			File$=PartThree$
+			SaveFileInfo()			
+			OriginalImage$=PartThree$
+			BOXVIEW SET  "BV_ImageLeft", "Label", "Dropzone/Input file: "+OriginalImage$
+			Output$=System$("cp "+"\""+PartThree$+"\""+" "+TempFolder$+"/temp")
+			OpenImage$=TempFolder$+"/temp"
+			wait 0.5
+			DrawView$="left"
+			DrawImage()
+			ActivateMenuItems()	
+			Info$="Ready"
+			Info()
+		endif
+		break
+		
+	case "VI_Menu1:Edit:Save|"	
+			Info$="Saving image..."
+			Info()
+			File$ = FILEPANEL "Save-File", "Save image", SaveFilePath$, SaveFile$
+			if(File$="")then
+			else
+				Output$=System$("cp -r "+TempFolder$+"/temp "+"\""+File$+"\"")
+			endif
+			n=0
+			i=0
+			File$=""
+			SaveFilePath$=""
+			SaveFile$=""
+			dim SplitDir$(1)
+			n = split(File$, SplitDir$(), "/")
+			for i = 1 to n-1
+				if(i=1)then
+					SaveFilePath$=SaveFilePath$
+				else
+					SaveFilePath$=SaveFilePath$+"/"+SplitDir$(i)
+				endif
+			next i
+			SaveFile$=SplitDir$(n)
+			MENU SET  "Edit", "Save", "Enable","VI_Menu1"
+			Info$="Ready"
+			Info()
+			break
+			
+	case "VI_Menu1:Edit:Export As...:PDF|"	
+			Info$="Exporting image..."
+			Info()
+			n=0
+			dim SaveFileName$(1)
+				n = split(SaveFile$, SaveFileName$(), ".")
+				SaveFile$=SaveFileName$(1)+".pdf"
+
+			File$ = FILEPANEL "Save-File", "Export image", SaveFilePath$, SaveFile$
+			if(File$="")then
+			else
+				Output$=System$("convert "+TempFolder$+"/temp "+"\""+File$+"\"")
+			endif
+			if(IfExists(SaveFilePath$+"/"+SaveFile$)) then
+				LAUNCH SaveFilePath$
+			else
+				ALERT "Could not create pdf file", "Ok", "stop"	
+			endif
+			n=0
+			i=0
+			File$=""
+			SaveFilePath$=""
+			SaveFile$=""
+			dim SplitDir$(1)
+			n = split(File$, SplitDir$(), "/")
+			for i = 1 to n-1
+				if(i=1)then
+					SaveFilePath$=SaveFilePath$
+				else
+					SaveFilePath$=SaveFilePath$+"/"+SplitDir$(i)
+				endif
+			next i
+			SaveFile$=SplitDir$(n)
+			MENU SET  "Edit", "Save", "Enable","VI_Menu1"
+			Info$="Ready"
+			Info()
+			break
+			
+	case "VI_Menu1:Edit:Undo|"
+		Info$="Undo image..."
+		Info()
+		MENU SET  "Edit", "Redo", "Enable","VI_Menu1"
+		if(undo=1)then
+			Output$=System$("cp "+"\""+OriginalImage$+"\""+" "+TempFolder$+"/temp")
+			OpenImage$=TempFolder$+"/temp"
+			DrawView$="right"
+			DrawImage()
+			MENU SET  "Edit", "Undo", "Disable","VI_Menu1"
+			undo=undo-1
+		else
+			Output$=System$("cp "+TempFolder$+"/undo"+str$(undo-1)+" "+TempFolder$+"/temp")
+			undo=undo-1
+			OpenImage$=TempFolder$+"/temp"
+			DrawView$="right"
+			DrawImage()			
+		endif
+		Info$="Ready"
+		Info()
+		break
+	
+	case "VI_Menu1:Edit:Redo|"
+		Info$="Redo image..."
+		Info()
+		MENU SET  "Edit", "Undo", "Enable","VI_Menu1"
+		Output$=System$("cp "+TempFolder$+"/undo"+str$(undo+1)+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Info$="Ready"
+		Info()
+		break
+		
+	//View	
+	case "VI_Menu1:View:Change ratio|"
+		Info$="Change reatio..."
+		Info()
+		BitmapXX2=BitmapX2
+		BitmapYY2=BitmapY2
+		BITMAP REMOVE "BM_Image"
+		DRAW FLUSH "VI_ImageLeft"
+		DRAW FLUSH "VI_ImageRight"	
+		BITMAP BitmapY2,BitmapX2, "BM_Image"
+			Err = DRAW IMAGE 0,0 TO BitmapY2,BitmapX2, OriginalImage$, "BM_Image"
+			DRAW BITMAP BitmapSize/2-BitmapY2/2,BitmapSize/2-BitmapX2/2 TO BitmapSize/2+BitmapY2/2,BitmapSize/2+BitmapX2/2, "BM_Image", "copy", "VI_ImageLeft"
+			Err = DRAW IMAGE 0,0 TO BitmapY2,BitmapX2, OpenImage$, "BM_Image"
+			DRAW BITMAP BitmapSize/2-BitmapY2/2,BitmapSize/2-BitmapX2/2 TO BitmapSize/2+BitmapY2/2,BitmapSize/2+BitmapX2/2, "BM_Image", "copy", "VI_ImageRight"
+		BitmapX2=BitmapYY2
+		BitmapY2=BitmapXX2
+		Info$="Ready"
+		Info()
+		break	
+	
+	//Adjust window size to screen size
+	case "VI_Menu1:View:Adjust window size to screen size|"
+		BitmapSize=screenHeight-30-30-30-185
+		ScreenSizeWidth=BitmapSize*2+10
+		ScreenSizeHeight=BitmapSize+30+30+30+148
+		WINDOW CLOSE ProgramID$
+		MainWindow()
+		break	
+	
+	case "VI_Menu1:View:Show full preview image|"
+		Launch(TempFolder$+"/temp")
+		break
+		
+	case "VI_Menu1:Edit:Restore|"
+		Info$="Restore image..."
+		Info()
+		Info$="Restore image..."
+		Info()
+		DeactivateMenuItems()
+		Output$=System$("cp "+"\""+OriginalImage$+"\""+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		wait 0.5
+		DrawView$="left"
+		DrawImage()
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		Info$="Ready"
+		Info()
+		break	
+
+	//Tools running
+	//Edit
+	//convert
+	
+	//convert_video-to-gif
+	case "VI_Menu2:Other:Animation:Convert Video to GIF|"
+		InputView$="convert_video-to-gif"
+		InputView()
+		Description$="convert_video-to-gif"
+		ReadoutDescription()
+		DeactivateMenuItems()
+		VideoLoad$ = FILEPANEL "Load-File-and-Directory", "Select AVI or MP4 movie file", "/boot/home"
+		VideoSave$ = FILEPANEL "Save-File", "Select output diectory and filename.gif", "/boot/home", "*.gif"
+		Info$="Please wait. working in progress!"
+		Info()
+		Output$=System$("convert -quiet -delay 1 "+VideoLoad$+" "+VideoSave$)
+		Info$="Ready"
+		Info()	
+		if(IfExists(VideoSave$)) then
+			dim DOutputFile$(1)
+				splitting = split(VideoSave$, DOutputFile$(), "/")
+				ToOpenFolder$=""
+				tox=0
+				toi=0
+				for toi = 1 to splitting-1
+					tox=tox+1
+					ToOpenFolder$=ToOpenFolder$+"/"+DOutputFile$(tox)
+				next toi
+				LAUNCH ToOpenFolder$
+		else
+			ALERT "Could not create video", "Ok", "stop"		
+		endif
+		break				
+		
+	//convert grayscale	
+	case "VI_Menu2:Other:Convert to Grayscale|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="grayscale"
+		InputView()
+		Description$="grayscale"
+		ReadoutDescription()
+		Output$=System$("convert -colorspace gray "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	case "VI_Menu2:Other:Fun:Abstract oil painting|"
+		InputView$="abstract-oil-paint"
+		InputView()
+		Description$="abstract-oil-paint"
+		ReadoutDescription()
+		Info$="Generating oil paint image..."
+		Info()
+		Output$=System$("cd "+TempFolder$+";convert -size 64x64 xc:#707070  -resize 2x2 -evaluate Gaussian-noise 0.152 -resize 4x4 -evaluate Gaussian-noise 0.123 -resize 8x8 -evaluate Gaussian-noise 0.100 -resize 16x16 -evaluate Gaussian-noise 0.081 -resize 32x32 -evaluate Gaussian-noise 0.065 -resize 64x64 -evaluate Gaussian-noise 0.053 -resize 128x128 -evaluate Gaussian-noise 0.043 -resize 256x256 -evaluate Gaussian-noise 0.035 -paint 10 -crop 239x239+0+0 -colorspace HSL -channel lightness -normalize -channel saturation -normalize -colorspace RGB -despeckle -rotate 90 "+Chr$(34)+"temp.jpg"+Chr$(34))
+		Output$=System$("mv "+TempFolder$+"/temp.jpg "+TempFolder$+"/temp")
+		File$=TempFolder$+"/temp"
+		SaveFileInfo()
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="left"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		MENU SET  "Edit", "Undo", "Disable","VI_Menu1"
+		break
+	
+	case "VI_Menu2:Other:Convert to Sketch|"
+		InputView$="sketch"
+		InputView()
+		Description$="sketch"
+		ReadoutDescription()
+		break
+			
+	case "BT_sketch|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_sketch", "Enabled", false 	
+		Radius$=TEXTCONTROL GET$ "TC_X"
+		Sigma$=TEXTCONTROL GET$ "TC_Y"
+		Angle$=TEXTCONTROL GET$ "TC_Angle"	
+		Output$=System$("convert -colorspace gray -sketch "+Radius$+"x"+Sigma$+"+"+Angle$+"  "+OpenImage$+" "+TempFolder$+"/temp" )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_sketch", "Enabled", true 	
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		Info$="Ready"
+		Info()
+		break
+		
+	//Create new image file
+	case "VI_Menu2:Other:New:Create new image file|"
+		InputView$="newimagefile"
+		InputView()
+		Description$="size"
+		ReadoutDescription()
+		break
+		
+	case "BT_newimagefile|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_newimagefile", "Enabled", false 	
+		Width$=TEXTCONTROL GET$ "TC_width"		
+		Height$=TEXTCONTROL GET$ "TC_height"
+		Colordepth$=TEXTCONTROL GET$ "TC_colordepth"
+		Output$=System$("cd "+TempFolder$+";convert -size "+Width$+"x"+Height$+"+"+Colordepth$+"  xc:#707070 "+Chr$(34)+"temp.jpg"+Chr$(34) )
+		Output$=System$("mv "+TempFolder$+"/temp.jpg "+TempFolder$+"/temp")
+		wait 1
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="left"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_newimagefile", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	//GIF animation using "loop"
+	case "VI_Menu2:Other:Animation:Create GIF animation|"	
+		InputView$="loop"
+		InputView()
+		Description$="loop"
+		ReadoutDescription()
+		break	
+		
+	//case "BT_select_folder|" is the same like "montage"
+	
+	case "BT_loop|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_loop", "Enabled", false 	
+		SourceFolder$=TEXTCONTROL GET$ "TC_source_folder"		
+		if(right$(SourceFolder$, 1)="/")then
+			lengh=len(SourceFolder$)
+			SourceFolder$=left$(SourceFolder$, lengh-1)
+		endif
+		SourcePicture$=TEXTCONTROL GET$ "TC_source_picture"
+		Value$=TEXTCONTROL GET$ "TC_value"
+		Output$=System$("convert -loop "+Value$+" "+"\""+SourceFolder$+"\""+"/"+"\""+SourcePicture$+"\""+" "+TempFolder$+"/animation.gif" )
+		Output$=System$("addattr -t mime BEOS:PREF_APP application/x-vnd.Haiku-WebPositive "+TempFolder$+"/animation.gif")
+		wait 1
+		OutputFile$ = FILEPANEL "Save-File", "Select output folder and file name", "/boot/home", "*.gif"
+		if(IfExists(TempFolder$+"/animation.gif" )) then
+			Output$=System$("mv "+TempFolder$+"/animation.gif  "+OutputFile$)
+			LAUNCH OutputFile$
+		else
+			ALERT  "Animation does not created!\n\nPlease check your input.", "Ok", "stop"
+		endif
+		OPTION SET "BT_loop", "Enabled", true 	
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break
+		
+	
+	//montage - collage	 
+	case "VI_Menu2:Other:Combine images:Collage|"
+		InputView$="collage"
+		InputView()
+		Description$="collage"
+		ReadoutDescription()
+		break
+	
+	case "BT_select_folder|"
+		File$ = FILEPANEL "Load-Directory", "Select directory with the Photos", "/boot/home"
+		TEXTCONTROL SET "TC_source_folder", File$
+		break
+	
+	case "BT_collage|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_collage", "Enabled", false 	
+		SourceFolder$=TEXTCONTROL GET$ "TC_source_folder"		
+		if(right$(SourceFolder$, 1)="/")then
+			lengh=len(SourceFolder$)
+			SourceFolder$=left$(SourceFolder$, lengh-1)
+		endif
+		SourcePicture$=TEXTCONTROL GET$ "TC_source_picture"
+		Geometry$=TEXTCONTROL GET$ "TC_geometry"
+		Tile$=TEXTCONTROL GET$ "TC_tile"
+		Output$=System$("montage -geometry "+Geometry$+" -tile "+Tile$+" "+"\""+SourceFolder$+"\""+"/"+"\""+SourcePicture$+"\""+" "+TempFolder$+"/collage" )
+		if(IfExists(TempFolder$+"/collage-0")) then
+			Output$=System$("mv "+TempFolder$+"/collage-0 "+TempFolder$+"/temp")
+		elseif(IfExists(TempFolder$+"/collage-1")) then
+			Output$=System$("mv "+TempFolder$+"/collage-1 "+TempFolder$+"/temp")
+		elseif(IfExists(TempFolder$+"/collage-2")) then
+			Output$=System$("mv "+TempFolder$+"/collage-2 "+TempFolder$+"/temp")
+		elseif(IfExists(TempFolder$+"/collage")) then
+			Output$=System$("mv "+TempFolder$+"/collage "+TempFolder$+"/temp")
+		endif
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="left"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_collage", "Enabled", true 	
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break
+		
+	//append	
+	case "VI_Menu2:Other:Combine images:Image at image|"
+		InputView$="append"
+		InputView()
+		Description$="append"
+		ReadoutDescription()
+		break
+		
+	//case "BT_select_folder|" the same like monage - collage
+	
+	case "DB_append:"+PartTwo$+"|"
+		if(PartTwo$="horizontal")then
+			Append$="+append"
+		elseif(PartTwo$="vertical")then
+			Append$="-append"
+		else
+			Append$="+append"
+		endif
+		break
+	
+	case "DB_suffix:"+PartTwo$+"|"
+		if(left$(PartTwo$,2)="*.")then
+			Suffix$=PartTwo$
+		else
+			Suffix$="*."+PartTwo$
+		endif
+		break
+
+	case "BT_append|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_append", "Enabled", false 	
+		SourceFolder$=TEXTCONTROL GET$ "TC_source_folder"	
+		Suffix$=TEXTCONTROL GET$ "TC_suffix"	
+		Output$=System$("convert "+Append$+" "+SourceFolder$+"/"+Suffix$+" "+TempFolder$+"/temp" )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="left"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_append", "Enabled", true 	
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break	
+		
+			
+		
+	
+	//Export image metadata
+	case "VI_Menu2:Other:Export image metadata|"
+		Info$="Please wait. working in progress!"
+		Info()
+		InputView$="metadata"
+		InputView()
+		Description$="metadata"
+		ReadoutDescription()
+		DeactivateMenuItems()
+		ExportFile$ = FILEPANEL "Save-File", "Export image metadata",  "/boot/home", "*.txt"
+		Output$=System$("identify -verbose "+TempFolder$+"/temp > "+ExportFile$)
+		LAUNCH ExportFile$
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break
+	
+	//Split image file
+	case "VI_Menu2:Other:Split image into tiles|"
+		InputView$="splitimage"
+		InputView()
+		Description$="splitimage"
+		ReadoutDescription()
+		break
+	
+	case "SL_percentX:"+PartTwo$+"|"
+		if(val(PartTwo$)>=0 and val(PartTwo$)<=10)then
+			PercentX$="10"
+		elseif(val(PartTwo$)>10 and val(PartTwo$)<=20)then
+			PercentX$="20"
+		elseif(val(PartTwo$)>20 and val(PartTwo$)<=30)then
+			PercentX$="30"
+		elseif(val(PartTwo$)>30 and val(PartTwo$)<=40)then
+			PercentX$="40"
+		elseif(val(PartTwo$)>40 and val(PartTwo$)<=50)then
+			PercentX$="50"
+		elseif(val(PartTwo$)>50 and val(PartTwo$)<=60)then
+			PercentX$="60"
+		elseif(val(PartTwo$)>60 and val(PartTwo$)<=70)then
+			PercentX$="70"
+		elseif(val(PartTwo$)>70 and val(PartTwo$)<=80)then
+			PercentX$="80"
+		elseif(val(PartTwo$)>80 and val(PartTwo$)<=90)then
+			PercentX$="90"
+		elseif(val(PartTwo$)>90 and val(PartTwo$)<=100)then
+			PercentX$="100"
+		endif
+		SLIDER SET "SL_percentX", val(PercentX$)
+
+		DRAW FLUSH "VI_InputSet"
+		DRAW TEXT 5,15, "X(%):        "+PercentX$, "VI_InputSet"
+		if(PercentY$="")then
+			PercentY$="0"
+		endif
+		DRAW TEXT 5,40, "Y(%):       "+PercentY$, "VI_InputSet"
+		break
+	
+	case "SL_percentY:"+PartTwo$+"|"
+		if(val(PartTwo$)>=0 and val(PartTwo$)<=10)then
+			PercentY$="10"
+		elseif(val(PartTwo$)>10 and val(PartTwo$)<=20)then
+			PercentY$="20"
+		elseif(val(PartTwo$)>20 and val(PartTwo$)<=30)then
+			PercentY$="30"
+		elseif(val(PartTwo$)>30 and val(PartTwo$)<=40)then
+			PercentY$="40"
+		elseif(val(PartTwo$)>40 and val(PartTwo$)<=50)then
+			PercentY$="50"
+		elseif(val(PartTwo$)>50 and val(PartTwo$)<=60)then
+			PercentY$="60"
+		elseif(val(PartTwo$)>60 and val(PartTwo$)<=70)then
+			PercentY$="70"
+		elseif(val(PartTwo$)>70 and val(PartTwo$)<=80)then
+			PercentY$="80"
+		elseif(val(PartTwo$)>80 and val(PartTwo$)<=90)then
+			PercentY$="90"
+		elseif(val(PartTwo$)>90 and val(PartTwo$)<=100)then
+			PercentY$="100"
+		endif
+		SLIDER SET "SL_percentY", val(PercentY$)
+		
+		DRAW FLUSH "VI_InputSet"
+		if(PercentX$="")then
+			PercentX$="0"
+		endif
+		DRAW TEXT 5,15, "X(%):        "+PercentX$, "VI_InputSet"
+		DRAW TEXT 5,40, "Y(%):       "+PercentY$, "VI_InputSet"
+		break
+		
+	case "BT_splitimage|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		if(PercentX$="")then
+			PercentX$="10"
+		endif
+		if(PercentY$="")then
+			PercentY$="10"
+		endif
+		OPTION SET "BT_splitimage", "Enabled", false 	
+		Output$=System$("cd "+TempFolder$+";convert -crop "+PercentX$+"%x"+PercentY$+"% +repage "+TempFolder$+"/temp  "+TempFolder$+"/temp%.jpg")
+		OPTION SET "BT_splitimage", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		LAUNCH TempFolder$
+		break
+		
+	
+	
+	//Templates
+	//Templates Window
+	case "VI_MenuTemplates:Templates:New|"
+		TemplateWindow()	
+		break
+	
+	case "DB_ConvertMogrify:"+PartTwo$+"|"
+		TEXTEDIT CLEAR "TE_TemplateString"
+		TEXTCONTROL CLEAR "TC_Inputfiles"
+		if(trim$(TEXTCONTROL GET$ "TC_TemplateName")="")then
+			ALERT "You need to define a template name first", "Ok", "stop"
+		else
+			if(PartTwo$="convert")then
+				Selected_IMCommand$=PartTwo$
+				TEXTEDIT SET "TE_TemplateString", "editable", true
+				OPTION SET "TC_Inputfiles", "Enabled", true
+				TEXTCONTROL SET "TC_Inputfiles", "InputFile$"
+				DRAW FLUSH "VI_NewTemplate"
+				DRAW TEXT 10,200, "* ouput imag file are fixed", "VI_NewTemplate"
+			elseif(PartTwo$="mogrify")then
+				Selected_IMCommand$=PartTwo$
+				TEXTEDIT SET "TE_TemplateString", "editable", true
+				OPTION SET "TC_Inputfiles", "Enabled", false
+				DRAW FLUSH "VI_NewTemplate"
+				DRAW TEXT 10,200, "* input image file and ouput image file are fixed", "VI_NewTemplate"
+			endif
+			OPTION SET "BT_CreateTemplate", "Enabled", true 	
+			readout=open(ProgramFolder$+"/data/operators", "r")
+				templi=0
+				templx=0
+				while (not EOF(readout))
+					templx=templx+1
+					line input #readout templb$
+					dim templd$(templx)
+						templd$(templx)=templb$
+						dim elements$(1)
+							numElements = split(templd$(templx), elements$(),"|")
+							for templi = 1 to readout
+								MENU SET trim$(elements$(1)), trim$(elements$(2)), "Enable",  "VI_NewTemplate"
+							next templi
+				wend
+		endif
+		break
+	
+	case "VI_NewTemplate:_QuitRequested|"
+		WINDOW CLOSE "VI_NewTemplate"
+		break
+		
+	//Menu selection and add into string textedit	
+	case "VI_NewTemplate:"+PartTwo$+":"+PartThree$+"|"
+		readout=open(ProgramFolder$+"/data/operators", "r")
+			templi=0
+			templx=0
+			while (not EOF(readout))
+				templx=templx+1
+				line input #readout templb$
+				dim templd$(templx)
+					templd$(templx)=templb$
+					dim elements$(1)
+						numElements = split(templd$(templx), elements$(),"|")
+						for templi = 1 to readout
+							if(trim$(elements$(1))=trim$(PartTwo$) and trim$(elements$(2))=trim$(PartThree$))then
+								TEXTEDIT ADD "TE_TemplateString", " "+trim$(elements$(3))
+								break
+							endif							
+						next templi
+			wend
+		break
+	
+	//Create new template	
+	case "BT_CreateTemplate|"
+		TemplateName$=TEXTCONTROL GET$ "TC_TemplateName"
+		TemplateString$=TEXTEDIT GET$ "TE_TemplateString"
+		TemplateInputfiles$=TEXTCONTROL GET$ "TC_Inputfiles"
+		//Selected_IMCommand$ (convert or mogrify)
+		
+		dim CheckInputFiles$(1)
+			numElements = split(TemplateInputfiles$, CheckInputFiles$(), " ")
+			i=0
+			TemplateInputfiles$=""
+			for i = 1  to numElements
+				if(CheckInputFiles$(i)="InputFile$")then
+					TemplateInputfiles$=TemplateInputfiles$+TempFolder$+"/temp "
+				else
+					TemplateInputfiles$=TemplateInputfiles$+CheckInputFiles$(i)+" "
+				endif			
+			next i
+			
+		//Create template: command + string + inpit files + output file			
+		writefile = open(TemplatesFolder$+"/"+TemplateName$, "w")
+			print #writefile Selected_IMCommand$+" "+TemplateString$+" "+TemplateInputfiles$+" "+TempFolder$+"/temp"				
+		close(writefile)
+		
+		VIEW REMOVE "VI_MenuTemplates"
+		VIEW 201,0 TO 310,20, "VI_MenuTemplates", ProgramID$
+		MENU "Templates", "New", "",  "VI_MenuTemplates"	
+		MENU "Templates", "--", "",  "VI_MenuTemplates"
+		
+		if(IfExists(TemplatesFolder$+"/"+"\""+TemplateName$+"\"")) then
+			x=0
+			i=0
+			ReadTemplatesFiles$=system$("ls -G -1 "+TemplatesFolder$)
+				dim SplitDir$(1)
+					x = split(ReadTemplatesFiles$, SplitDir$(), "\n")
+					for i = 1 to x-1
+						MENU "Templates", trim$(SplitDir$(i)), "",  "VI_MenuTemplates"	
+						if(OriginalImage$="")then
+							MENU SET "Templates", trim$(SplitDir$(i)), "Disable",   "VI_MenuTemplates"	
+						endif
+					next i		
+		else
+			ALERT "Templates could not created!", "Ok", "stop"
+		endif		
+		break
+		
+	//Run template
+	case "VI_MenuTemplates:Templates:"+PartThree$+"|"
+		if(PartThree$="New")then
+		else
+			Info$="Please wait. working in progress!"
+			Info()
+			DeactivateMenuItems()
+			
+			readout=open(TemplatesFolder$+"/"+PartThree$, "r")
+			i=0
+			x=0
+			while (not EOF(readout))
+				x=x+1
+				line input #readout b$
+				dim templd$(x)
+					templd$(x)=b$
+			wend
+			Output$=System$(templd$(x))
+			
+			OpenImage$=TempFolder$+"/temp"
+			DrawView$="right"
+			DrawImage()
+			undo=undo+1
+			Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+			Info$="Ready"
+			Info()
+			ActivateMenuItems()
+		endif		
+	break
+			
+		
+		
+	//Function Menu
+	//convert
+	//brightness-contrast
+	case "VI_Menu2:Contrast:brightness-contrast|"
+		InputView$="brightness-contrast"
+		InputView()
+		Description$="brightness-contrast"
+		ReadoutDescription()
+		break
+	
+	case "BT_brightness-contrast|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_brightness-contrast", "Enabled", false 
+		Brightness$=TEXTCONTROL GET$ "TC_brightness"
+		Contrast$=TEXTCONTROL GET$ "TC_contrast"		
+		Output$=System$("convert -brightness-contrast "+Brightness$+"x"+Contrast$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_brightness-contrast", "Enabled", true 
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break	
+		
+	//channel
+	case "VI_Menu2:Colors:channel:"+PartFour$+"|"	
+		Info$="Please wait. working in progress!"
+		Info()
+		InputView$="channel"
+		InputView()
+		Description$="channel"
+		ReadoutDescription()
+		Output$=System$("convert -channel "+PartFour$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break
+		
+	//colors
+	case "VI_Menu2:Colors:colors:"+PartFour$+"|"	
+		if(PartFour$="user defined")then
+		else
+			Info$="Please wait. working in progress!"
+		endif
+		Info()
+		InputView$="colors"
+		InputView()
+		Description$="colors"
+		ReadoutDescription()
+		if(PartFour$="user defined")then
+		else
+			Output$=System$("convert -colors "+PartFour$+" "+OpenImage$+" "+TempFolder$+"/temp")
+			OpenImage$=TempFolder$+"/temp"
+			DrawView$="right"
+			DrawImage()
+			undo=undo+1
+			Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+			Info$="Ready"
+			Info()	
+			ActivateMenuItems()
+		endif
+		break
+	
+	case "SL_colors:"+PartTwo$+"|"
+		Colors$=PartTwo$
+		DRAW FLUSH "VI_InputSet"
+		DRAW TEXT 5,15, "Colors:        "+PartTwo$, "VI_InputSet"
+		break
+	
+	case "BT_colors|"
+		Info$="Please wait. working in progress!"
+		Info()
+		OPTION SET "BT_colors", "Enabled", false 
+		DeactivateMenuItems()
+		//Colors$=TEXTCONTROL GET$ "TC_colors"
+		Output$=System$("convert -colors "+Colors$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_colors", "Enabled", true 
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break				
+		
+	
+	//colorspace
+	case "VI_Menu2:Colors:colorspace:"+PartFour$+"|"	
+		Info$="Please wait. working in progress!"
+		Info()
+		InputView$="colorspace"
+		InputView()
+		Description$="colorspace"
+		ReadoutDescription()
+		Output$=System$("convert -colorspace "+PartFour$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break
+	
+	//compress
+	case "VI_Menu2:Size:compress:"+PartFour$+"|"
+		Info$="Please wait. working in progress!"
+		Info()
+		InputView$="compress"
+		InputView()
+		Description$="compress"
+		ReadoutDescription()
+		Output$=System$("convert -compress "+PartFour$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break
+		
+	//crop
+	case "VI_Menu2:Size:crop:"+PartFour$+"|"
+		if(PartFour$="percent")then	
+			CropSelection$=PartFour$
+		else
+			CropSelection$="other"
+		endif			
+		InputView$="crop"
+		InputView()
+		Description$="crop"
+		ReadoutDescription()
+		break
+	
+	case "SL_percent:"+PartTwo$+"|"
+		Percent$=trim$(PartTwo$)+"%"
+		DRAW FLUSH "VI_InputSet"
+		DRAW TEXT 5,15, "Percent:    "+PartTwo$+"%", "VI_InputSet"
+		break
+		
+	case "BT_crop|"
+		Info$="Please wait. working in progress!"
+		Info()
+		OPTION SET "BT_crop", "Enabled", false 
+		DeactivateMenuItems()		
+		if(CropSelection$="percent")then			
+			//Percent$=TEXTCONTROL GET$ "TC_percent"
+			Output$=System$("convert -crop "+Percent$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		else
+			Width$=TEXTCONTROL GET$ "TC_width"
+			Height$=TEXTCONTROL GET$ "TC_height"
+			X$=TEXTCONTROL GET$ "TC_x"
+			Y$=TEXTCONTROL GET$ "TC_y"
+			if(trim$(X$)="" or trim$(Y$)="")then
+				Output$=System$("convert -crop "+Width$+"x"+Height$+" "+OpenImage$+" "+TempFolder$+"/temp")
+			else
+				Output$=System$("convert -crop "+Width$+"x"+Height$+X$+Y$+" "+OpenImage$+" "+TempFolder$+"/temp")
+			endif
+		endif
+		Output$=System$("mv "+TempFolder$+"/temp-0 "+TempFolder$+"/temp")
+		wait 0.5
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_crop", "Enabled", true 
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break		
+		
+	//chop
+	case "VI_Menu2:Effects:chop|"
+		InputView$="chop"
+		InputView()
+		Description$="chop"
+		ReadoutDescription()
+		break
+	
+	case "BT_chop|"
+		Info$="Please wait. working in progress!"
+		Info()
+		OPTION SET "BT_chop", "Enabled", false 
+		DeactivateMenuItems()
+		X$=TEXTCONTROL GET$ "TC_x"
+		Y$=TEXTCONTROL GET$ "TC_y"
+		Column$=TEXTCONTROL GET$ "TC_column"
+		Row$=TEXTCONTROL GET$ "TC_row"
+		Output$=System$("convert -chop "+X$+"x"+Y$+"+"+Column$+"+"+Row$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_chop", "Enabled", true 
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break			
+		
+	
+	//cycle
+	case "VI_Menu2:Effects:cycle|"
+		InputView$="cycle"
+		InputView()
+		Description$="cycle"
+		ReadoutDescription()
+		break
+	
+	case "BT_cycle|"
+		Info$="Please wait. working in progress!"
+		Info()
+		OPTION SET "BT_cycle", "Enabled", false 
+		DeactivateMenuItems()
+		Amount$=TEXTCONTROL GET$ "TC_amount"
+		Output$=System$("convert -cycle "+Amount$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_cycle", "Enabled", true 
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break	
+	
+	//enhance		
+	case "VI_Menu2:Sharping:enhance|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="enhance"
+		InputView()
+		Description$="enhance"
+		ReadoutDescription()
+		Output$=System$("convert -enhance "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break
+	
+	//equalize		
+	case "VI_Menu2:Size:equalize|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="equalize"
+		InputView()
+		Description$="equalize"
+		ReadoutDescription()
+		Output$=System$("convert -equalize "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()	
+		ActivateMenuItems()
+		break
+	
+	//evaluate	
+	case "VI_Menu2:Sharping:Gaussian-noise|"
+		InputView$="evaluate-gaussian-noise"
+		InputView()
+		Description$="gaussian-noise"
+		ReadoutDescription()
+		break
+		
+	case "BT_evaluate-gaussian-noise|"
+		Info$="Please wait. working in progress!"
+		Info()
+		OPTION SET "BT_evaluate-gaussian-noise", "Enabled", false 
+		DeactivateMenuItems()
+		Value$=TEXTCONTROL GET$ "TC_value"			
+		Output$=System$("convert -evaluate Gaussian-noise "+Value$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_evaluate-gaussian-noise", "Enabled", true 
+		Info$="Ready"
+		Info()		
+		ActivateMenuItems()
+		break		
+		
+	//flip
+	case "VI_Menu2:Align:flip|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="flip"
+		InputView()
+		Description$="flip"
+		ReadoutDescription()
+		Output$=System$("convert -flip "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	//flop		
+	case "VI_Menu2:Align:flop|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="flop"
+		InputView()
+		Description$="flop"
+		ReadoutDescription()
+		Output$=System$("convert -flop "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+	
+	//gamma	
+	case "VI_Menu2:Colors:gamma:All|"
+		InputView$="gamma-all"
+		InputView()
+		Description$="gamma"
+		ReadoutDescription()
+		break
+		
+	case "SL_gamma:"+PartTwo$+"|"
+		Gamma=val(PartTwo$)/100
+		Gamma$=str$(Gamma)
+		break	
+		
+	case "BT_gamma-all|"
+		Info$="Please wait. working in progress!"
+		Info()
+		OPTION SET "BT_gamma-all", "Enabled", false 
+		DeactivateMenuItems()
+		//Gamma$=TEXTCONTROL GET$ "TC_gamma"			
+		Output$=System$("convert -gamma "+Gamma$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_gamma-all", "Enabled", true 
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	case "VI_Menu2:Colors:gamma:RGB|"
+		InputView$="gamma-rgb"
+		InputView()
+		Description$="gamma"
+		ReadoutDescription()
+		break
+		
+	case "SL_red:"+PartTwo$+"|"
+	case "SL_green:"+PartTwo$+"|"
+	case "SL_blue:"+PartTwo$+"|"
+		if(PartOne$="SL_red")then
+			R=val(PartTwo$)/100
+			R$=str$(R)
+			DRAW FLUSH "VI_InputSet"
+			DRAW TEXT 5,15, "Red:           "+R$, "VI_InputSet"
+			DRAW TEXT 5,40, "Green:      "+G$, "VI_InputSet"
+			DRAW TEXT 5,65, "Blue:          "+B$, "VI_InputSet"
+		elseif(PartOne$="SL_green")then
+			G=val(PartTwo$)/100
+			G$=str$(G)
+			DRAW FLUSH "VI_InputSet"
+			DRAW TEXT 5,15, "Red:           "+R$, "VI_InputSet"
+			DRAW TEXT 5,40, "Green:      "+G$, "VI_InputSet"
+			DRAW TEXT 5,65, "Blue:          "+B$, "VI_InputSet"
+		elseif(PartOne$="SL_blue")then
+			B=val(PartTwo$)/100
+			B$=str$(B)
+			DRAW FLUSH "VI_InputSet"
+			DRAW TEXT 5,15, "Red:           "+R$, "VI_InputSet"
+			DRAW TEXT 5,40, "Green:      "+G$, "VI_InputSet"
+			DRAW TEXT 5,65, "Blue:          "+B$, "VI_InputSet"
+		endif	
+		break	
+		
+	case "BT_gamma-rgb|"
+		Info$="Please wait. working in progress!"
+		Info()
+		OPTION SET "BT_gamma-rgb", "Enabled", false 
+		DeactivateMenuItems()
+		
+		//R$=TEXTCONTROL GET$ "TC_red"	
+		//G$=TEXTCONTROL GET$ "TC_green"
+		//B$=TEXTCONTROL GET$ "TC_blue"		
+		Output$=System$("convert -gamma "+R$+","+G$+","+B$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		OPTION SET "BT_gamma-rgb", "Enabled", true
+		Info()
+		ActivateMenuItems()
+		break		
+		
+	//interlace		
+	case "VI_Menu2:Colors:interlace:"+PartFour$+"|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="interlace"
+		InputView()
+		Description$="interlace"
+		ReadoutDescription()
+		Output$=System$("convert -interlace "+PartFour$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+		
+	//implode
+	case "VI_Menu2:Effects:implode|"
+		InputView$="implode"
+		InputView()
+		Description$="implode"
+		ReadoutDescription()
+		break
+		
+	case "BT_implode|"
+		Info$="Please wait. working in progress!"
+		Info()
+		OPTION SET "BT_implode", "Enabled", false 
+		DeactivateMenuItems()
+		Amount$=TEXTCONTROL GET$ "TC_amount"		
+		Output$=System$("convert -implode "+Amount$+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_implode", "Enabled", true 
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+		
+	//level
+	case "VI_Menu2:Contrast:level|"
+		InputView$="level"
+		InputView()
+		Description$="level"
+		ReadoutDescription()
+		break	
+	
+	case "SL_whitepoint:"+PartTwo$+"|"
+		Whitepoint$=PartTwo$
+		SLIDER SET "SL_whitepoint", val(Whitepoint$)
+		
+		DRAW FLUSH "VI_InputSet"
+		if(Whitepoint$="")then
+			Whitepoint$="0"
+		endif
+		DRAW TEXT 5,15, "White Point (%):       "+Whitepoint$, "VI_InputSet"
+		DRAW TEXT 5,40, "Black Point (%):       "+Blackpoint$, "VI_InputSet"
+		break
+		
+	case "SL_blackpoint:"+PartTwo$+"|"
+		Blackpoint$=PartTwo$
+		SLIDER SET "SL_blackpoint", val(Blackpoint$)
+		
+		DRAW FLUSH "VI_InputSet"
+		if(Blackpoint$="")then
+			Blackpoint$="0"
+		endif
+		DRAW TEXT 5,15, "White Point (%):       "+Whitepoint$, "VI_InputSet"
+		DRAW TEXT 5,40, "Black Point (%):       "+Blackpoint$, "VI_InputSet"
+		break	
+	
+	case "BT_level|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_level", "Enabled", false 	
+		Output$=System$("convert -level "+Whitepoint$+"%,"+Blackpoint$+"% "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_level", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+		
+	//magnify	
+	case "VI_Menu2:Size:magnify|"
+		InputView$="magnify"
+		InputView()
+		Description$="magnify"
+		ReadoutDescription()
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		Output$=System$("convert -magnify  "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+	
+		
+			
+	//monochrome	
+	case "VI_Menu2:Effects:monochrome|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="monochrome"
+		InputView()
+		Description$="monochrome"
+		ReadoutDescription()
+		Output$=System$("convert -monochrome "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	//negate		
+	case "VI_Menu2:Effects:negate|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="negate"
+		InputView()
+		Description$="negate"
+		ReadoutDescription()
+		Output$=System$("convert -negate "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	//noise		
+	case "VI_Menu2:Sharping:noise|"
+		InputView$="noise"
+		InputView()
+		Description$="noise"
+		ReadoutDescription()
+		break
+		
+	case "BT_noise|"	
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_noise", "Enabled", false 
+		Noise$=TEXTCONTROL GET$ "TC_noise"
+		Output$=System$("convert -noise "+Noise$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_noise", "Enabled", true 
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+		
+	//normalize		
+	case "VI_Menu2:Colors:normalize|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="normalize"
+		InputView()
+		Description$="normalize"
+		ReadoutDescription()
+		//TEXTEDIT CLEAR "TE_Description"
+		Output$=System$("convert  -normalize "+OpenImage$+" "+TempFolder$+"/temp")	
+		//Output$=System$("convert -monitor -normalize "+OpenImage$+" "+TempFolder$+"/temp 2>&1")		
+		//TEXTEDIT ADD "TE_Description", Output$
+		
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	//modulate
+	case"VI_Menu2:Effects:modulate|"
+		InputView$="modulate"
+		InputView()
+		Description$="modulate"
+		ReadoutDescription()
+		break
+		
+	case "BT_modulate|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_modulate", "Enabled", false 	
+		Value$=TEXTCONTROL GET$ "TC_value"	
+		Output$=System$("mogrify -modulate "+Value$+" "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_modulate", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	//modulate Hue
+	case "VI_Menu2:Effects:modulate:hue|"
+		InputView$="modulate-hue"
+		InputView()
+		Description$="modulate-hue"
+		ReadoutDescription()
+		break	
+	
+	case"BT_modulate-hue|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_modulate-hue", "Enabled", false 	
+		Value1$=TEXTCONTROL GET$ "TC_value1"
+		Value2$=TEXTCONTROL GET$ "TC_value2"	
+		Hue$=TEXTCONTROL GET$ "TC_hue"
+
+		Output$=System$("convert  -modulate "+trim$(Value1$)+","+trim$(Value2$)+","+trim$(Hue$)+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()		
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_modulate-hue", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break		
+		
+	
+	//motion-blur
+	case "VI_Menu2:Blurring:motion-blur|"
+		InputView$="motion-blur"
+		InputView()
+		Description$="motion-blur"
+		ReadoutDescription()
+		break	
+	
+	case"BT_motion-blur|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_motion-blur", "Enabled", false 	
+		Radius$=TEXTCONTROL GET$ "TC_radius"
+		Sigma$=TEXTCONTROL GET$ "TC_sigma"
+		Angle$=TEXTCONTROL GET$ "TC_angle"
+		Output$=System$("convert -motion-blur "+Radius$+"x"+Sigma$+"+"+Angle$+" "+OpenImage$+" "+TempFolder$+"/temp" )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_motion-blur", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+		
+	//resample
+	case "VI_Menu2:Size:resample|"
+		InputView$="resample"
+		InputView()
+		Description$="resample"
+		ReadoutDescription()
+		break		
+		
+	case"BT_resample|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_resample", "Enabled", false 	
+		X$=TEXTCONTROL GET$ "TC_x"
+		Y$=TEXTCONTROL GET$ "TC_y"
+		Output$=System$("convert -resample "+trim$(X$)+"x"+trim$(Y$)+" "+OpenImage$+" "+TempFolder$+"/temp" )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_resample", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break				
+	
+	//resize
+	case "VI_Menu2:Size:resize|"
+		InputView$="resize"
+		InputView()
+		Description$="resize"
+		ReadoutDescription()
+		break	
+		
+	case"BT_resize|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_resize", "Enabled", false 	
+		Width$=TEXTCONTROL GET$ "TC_width"
+		Height$=TEXTCONTROL GET$ "TC_height"
+		Output$=System$("convert -resize "+trim$(Width$)+"x"+trim$(Height$)+" "+OpenImage$+" "+TempFolder$+"/temp" )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_resize", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+	
+	//rotate		
+	case "VI_Menu2:Align:rotate:"+PartFour$+"|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="rotate"
+		InputView()
+		Description$="rotate"
+		ReadoutDescription()
+		Output$=System$("convert -rotate "+PartFour$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	//scale	
+	case "VI_Menu2:Size:scale|"
+		InputView$="scale"
+		InputView()
+		Description$="scale"
+		ReadoutDescription()
+		break
+		
+	case"BT_scale|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_scale", "Enabled", false 	
+		Width$=TEXTCONTROL GET$ "TC_width"
+		Height$=TEXTCONTROL GET$ "TC_height"
+		Output$=System$("convert -scale "+Width$+"x"+Height$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_scale", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+		
+		
+	//selective-blur
+	case "VI_Menu2:Blurring:selective-blur|"
+		InputView$="selective-blur"
+		InputView()
+		Description$="selective-blur"
+		ReadoutDescription()
+		break
+		
+	case"BT_selective-blur|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_selective-blur", "Enabled", false 	
+		Radius$=TEXTCONTROL GET$ "TC_radius"
+		Sigma$=TEXTCONTROL GET$ "TC_sigma"
+		Threshold$=TEXTCONTROL GET$ "TC_threshold"
+		Output$=System$("convert -selective-blur "+Radius$+"x"+Sigma$+"+"+Threshold$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_selective-blur", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break			
+			
+	//sharpen
+	case "VI_Menu2:Sharping:sharpen|"
+		InputView$="sharpen"
+		InputView()
+		Description$="sharpen"
+		ReadoutDescription()
+		break	
+		
+	case"BT_sharpen|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_sharpen", "Enabled", false 	
+		Factor$=TEXTCONTROL GET$ "TC_factor"
+		Output$=System$("convert -sharpen "+Factor$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_sharpen", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+	
+	//sigmodal-contrast
+	case "VI_Menu2:Contrast:sigmoidal-contrast:"+PartFour$+"|"
+		negpos$=trim$(PartFour$)
+		InputView$="sigmoidal-contrast"
+		InputView()
+		Description$="sigmoidal-contrast"
+		ReadoutDescription()
+		break	
+		
+	case"BT_sigmoidal-contrast|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_sigmoidal-contrast", "Enabled", false 	
+		Value$=TEXTCONTROL GET$ "TC_value"
+		Percent$=TEXTCONTROL GET$ "TC_percent"
+		Output$=System$("convert "+negpos$+"sigmoidal-contrast "+Value$+"x"+Percent$+" "+OpenImage$+" "+TempFolder$+"/temp" )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_sigmoidal-contrast", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break		
+	
+		
+	//size
+	case "VI_Menu2:Size:size|"
+		InputView$="size"
+		InputView()
+		Description$="size"
+		ReadoutDescription()
+		break	
+		
+	case"BT_size|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_size", "Enabled", false 	
+		Width$=TEXTCONTROL GET$ "TC_width"
+		Height$=TEXTCONTROL GET$ "TC_height"
+		Colordepth$=TEXTCONTROL GET$ "TC_colordepth"
+		Output$=System$("convert -size "+trim$(Width$)+"x"+trim$(Height$)+"+"+trim$(Colordepth$)+" "+OpenImage$+" "+TempFolder$+"/temp" )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_size", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	//shave
+	case "VI_Menu2:Size:shave|"
+		InputView$="shave"
+		InputView()
+		Description$="shave"
+		ReadoutDescription()
+		break	
+		
+	case"BT_shave|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_shave", "Enabled", false 	
+		X$=TEXTCONTROL GET$ "TC_x"
+		Y$=TEXTCONTROL GET$ "TC_y"
+
+		Output$=System$("convert -shave "+trim$(X$)+"x"+trim$(Y$)+" "+OpenImage$+" "+TempFolder$+"/temp" )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_shave", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break			
+	
+	//unscharp
+	case "VI_Menu2:Blurring:unsharp|"
+		InputView$="unsharp"
+		InputView()
+		Description$="unsharp"
+		ReadoutDescription()
+		break		
+		
+	case"BT_unsharp|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_unsharp", "Enabled", false 	
+		Radius$=TEXTCONTROL GET$ "TC_Radius"
+		Sigma$=TEXTCONTROL GET$ "TC_Sigma"	
+		Amount$=TEXTCONTROL GET$ "TC_Amount"
+		Threshold$=TEXTCONTROL GET$ "TC_Threshold"
+		
+		Output$=System$("convert -unsharp "+Radius$+"x"+Sigma$+" + "+Amount$+" + "+Threshold$+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()		
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_unsharp", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	//vignette
+	case "VI_Menu2:Effects:vignette|"
+		InputView$="vignette"
+		InputView()
+		Description$="vignette"
+		ReadoutDescription()
+		break		
+	
+	case"BT_vignette|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_vignette", "Enabled", false 	
+		X$=TEXTCONTROL GET$ "TC_X"
+		Y$=TEXTCONTROL GET$ "TC_Y"	
+		ValueR = COLORCONTROL GET "CC_vignette", "Red"
+		ValueG = COLORCONTROL GET "CC_vignette", "Green"
+		ValueB = COLORCONTROL GET "CC_vignette", "Blue"
+		Output$=System$("convert -background "+Chr$(34)+"rgb("+Str$(ValueR)+","+Str$(ValueG)+","+Str$(ValueB)+")"+Chr$(34)+" -vignette "+X$+","+Y$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"		
+		DrawView$="right"
+		DrawImage()		
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_vignette", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+		
+	//adaptive-sharpen
+	case"VI_Menu2:Sharping:adaptive-sharpen|"
+		InputView$="adaptive-sharpen"
+		InputView()
+		Description$="adaptive-sharpen"
+		ReadoutDescription()
+		break
+		
+	case"BT_adaptive-sharpen|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_adaptive-sharpen", "Enabled", false 	
+		Radius$=TEXTCONTROL GET$ "TC_radius"
+		Sigma$=TEXTCONTROL GET$ "TC_sigma"			
+		Output$=System$("mogrify -adaptive-sharpen "+Radius$+"x"+Sigma$+" "+OpenImage$ )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_adaptive-sharpen", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+	
+	
+	//adaptive-blur
+	case"VI_Menu2:Blurring:adaptive-blur|"
+		InputView$="adaptive-blur"
+		InputView()
+		Description$="adaptive-blur"
+		ReadoutDescription()
+		break
+		
+	case"BT_adaptive-blur|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_adaptive-blur", "Enabled", false 	
+		Radius$=TEXTCONTROL GET$ "TC_radius"
+		Sigma$=TEXTCONTROL GET$ "TC_sigma"			
+		Output$=System$("mogrify -adaptive-blur "+Radius$+"x"+Sigma$+" "+OpenImage$ )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_adaptive-blur", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break			
+	
+	//auto-gamma
+	case"VI_Menu2:Colors:auto-gamma|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="auto-gamma"
+		InputView()
+		Description$="auto-gamma"
+		ReadoutDescription()
+		Output$=System$("mogrify -auto-gamma  "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	//auto-level
+	case"VI_Menu2:Colors:auto-level|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="auto-level"
+		InputView()
+		Description$="auto-level"
+		ReadoutDescription()
+		Output$=System$("mogrify -auto-level  "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	//auto-orient
+	case"VI_Menu2:Align:auto-orient|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="auto-orient"
+		InputView()
+		Description$="auto-orient"
+		ReadoutDescription()
+		Output$=System$("mogrify -auto-orient  "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	//border
+	case"VI_Menu2:Effects:border|"
+		InputView$="border"
+		InputView()
+		Description$="border"
+		ReadoutDescription()
+		break
+		
+	case "BT_border|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_border", "Enabled", false 	
+		X$=TEXTCONTROL GET$ "TC_X"
+		Y$=TEXTCONTROL GET$ "TC_Y"	
+		ValueR = COLORCONTROL GET "CC_border", "Red"
+		ValueG = COLORCONTROL GET "CC_border", "Green"
+		ValueB = COLORCONTROL GET "CC_border", "Blue"	
+		Output$=System$("mogrify -border "+X$+"x"+Y$+" -bordercolor "+Chr$(34)+"rgb("+Str$(ValueR)+","+Str$(ValueG)+","+Str$(ValueB)+")"+Chr$(34)+" "+OpenImage$ )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_border", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	//blur
+	case "VI_Menu2:Blurring:blur|"
+		InputView$="blur"
+		InputView()
+		Description$="blur"
+		ReadoutDescription()
+		break
+				
+	case"BT_blur|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_blur", "Enabled", false 	
+		Radius$=TEXTCONTROL GET$ "TC_Radius"
+		Sigma$=TEXTCONTROL GET$ "TC_Sigma"			
+		Output$=System$("mogrify -blur "+Radius$+","+Sigma$+" "+OpenImage$ )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_blur", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	//charcoal
+	case "VI_Menu2:Effects:charcoal|"
+		InputView$="charcoal"
+		InputView()
+		Description$="charcoal"
+		ReadoutDescription()
+		break	
+		
+	case"BT_charcoal|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_charcoal", "Enabled", false 	
+		Factor$=TEXTCONTROL GET$ "TC_factor"
+		Output$=System$("mogrify -charcoal "+Factor$+" "+OpenImage$ )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_charcoal", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	//colorize
+	case "VI_Menu2:Colors:colorize|"
+		InputView$="colorize"
+		InputView()
+		Description$="colorize"
+		ReadoutDescription()
+		break	
+		
+	case"BT_colorize|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_colorize", "Enabled", false 	
+		R$=TEXTCONTROL GET$ "TC_red"
+		G$=TEXTCONTROL GET$ "TC_green"
+		B$=TEXTCONTROL GET$ "TC_blue"
+		Output$=System$("mogrify -colorize "+R$+","+G$+","+B$+" "+OpenImage$ )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_colorize", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break		
+	
+	//contrast
+	case "VI_Menu2:Contrast:contrast:"+PartFour$+"|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="contrast"
+		InputView()
+		Description$="contrast"
+		ReadoutDescription()
+		Output$=System$("mogrify "+PartFour$+"contrast "+OpenImage$ )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+	
+	//contrast-stretch
+	case "VI_Menu2:Contrast:contrast-stretch|"
+		InputView$="contrast-stretch"
+		InputView()
+		Description$="contrast-stretch"
+		ReadoutDescription()
+		break	
+	
+	case"BT_contrast-stretch|"	
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_contrast-stretch", "Enabled", false 	
+		blackpoint$=TEXTCONTROL GET$ "TC_black-point"
+		whitepoint$=TEXTCONTROL GET$ "TC_white-point"		
+		Output$=System$("mogrify -contrast-stretch "+blackpoint$+","+whitepoint$+" "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_contrast-stretch", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break		
+		
+		
+		
+	//despeckle
+	case "VI_Menu2:Effects:despeckle|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		InputView$="despeckle"
+		InputView()
+		Description$="despeckle"
+		ReadoutDescription()
+		Output$=System$("mogrify -despeckle "+OpenImage$ )
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	//distort	
+	case  "VI_Menu2:Effects:distort:"+PartFour$+"|"
+		Type$="+distort"
+		Distort$=PartFour$
+		InputView$="distort"
+		InputView()
+		if(PartFour$="SRT")then
+			Description$="distort_SRT"
+		elseif(PartFour$="Affine")then
+			Description$="distort_Affine"
+		elseif(PartFour$="Arc")then
+			Description$="distort_Arc"
+		elseif(PartFour$="Barrel")then
+			Description$="distort_Barrel"	
+		elseif(PartFour$="Cylinder2Plane")then
+			Description$="distort_Cylinder2Plane"	
+		elseif(PartFour$="DePolar")then
+			Description$="distort_DePolar"
+		elseif(PartFour$="Plane2Cylinder")then
+			Description$="distort_Plane2Cylinder"
+		elseif(PartFour$="Polar")then
+			Description$="distort_Polar"
+		else
+			Description$="distort"
+		endif
+		ReadoutDescription()
+		break
+	
+	case "DB_DisortType:"+PartTwo$+"|"
+		Type$=PartTwo$
+		break
+		
+	case"BT_distort|"	
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_distort", "Enabled", false 	
+		if(Distort$="Affine")then
+			X$=TEXTCONTROL GET$ "TC_x"
+			if(trim$(X$)="")then
+				X$="0"
+			endif
+			Y$=TEXTCONTROL GET$ "TC_y"
+			if(trim$(Y$)="")then
+				Y$="0"
+			endif
+			if(Y$="0" and  X$="0")then
+				XY$=""
+			else
+				XY$=X$+","+Y$
+			endif
+			ScaleX$=TEXTCONTROL GET$ "TC_scalex"
+			if(trim$(ScaleX$)="")then
+				ScaleX$="0"
+			endif
+			ScaleY$=TEXTCONTROL GET$ "TC_scaley"
+			if(trim$(ScaleY$)="")then
+				ScaleY$="0"
+			endif
+			if(ScaleY$="0" and  ScaleX$="0")then
+				ScaleXY$=""
+			else
+				ScaleXY$=ScaleX$+","+ScaleY$
+			endif
+			Output$=System$("convert "+Type$+" Affine "+"\""+XY$+" "+ScaleXY$+"\""+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		elseif(Distort$="Arc")then
+			Angle$=TEXTCONTROL GET$ "TC_angle"
+			if(trim$(Angle$)="")then
+				Angle$="0"
+			endif
+			Rotate$=TEXTCONTROL GET$ "TC_rotate"
+			if(trim$(Rotate$)="")then
+				Rotate$="0"
+			endif
+			Output$=System$("convert "+Type$+" Arc "+"\""+Angle$+" "+Rotate$+"\""+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		elseif(Distort$="Barrel")then
+			A$=TEXTCONTROL GET$ "TC_a"
+			if(trim$(A$)="")then
+				A$="0.0"
+			endif
+			B$=TEXTCONTROL GET$ "TC_b"
+			if(trim$(A$)="")then
+				B$="0.0"
+			endif
+			C$=TEXTCONTROL GET$ "TC_c"
+			if(trim$(A$)="")then
+				C$="0.0"
+			endif
+			D$=TEXTCONTROL GET$ "TC_d"
+			if(trim$(A$)="")then
+				D$="0.0"
+			endif
+			Output$=System$("convert "+Type$+" Barrel "+"\""+A$+" "+B$+" "+C$+" "+D$+"\""+"  "+OpenImage$+" "+TempFolder$+"/temp")			
+		elseif(Distort$="Cylinder2Plane")then
+			Angle$=TEXTCONTROL GET$ "TC_angle"
+			Output$=System$("convert "+Type$+" Cylinder2Plane "+Angle$+"  "+OpenImage$+" "+TempFolder$+"/temp")	
+		elseif(Distort$="DePolar")then
+			RadiusMax$=TEXTCONTROL GET$ "TC_radiusmax"
+			RadiusMin$=TEXTCONTROL GET$ "TC_radiusmin"
+			CenterX$=TEXTCONTROL GET$ "TC_centerx"
+			CenterY$=TEXTCONTROL GET$ "TC_centery"
+			StartAngle$=TEXTCONTROL GET$ "TC_anglestart"
+			EndAngle$=TEXTCONTROL GET$ "TC_angleend"
+			Output$=System$("convert "+Type$+" DePolar '"+RadiusMax$+" "+RadiusMin$+" "+CenterX$+","+CenterY$+" "+StartAngle$+","+EndAngle$+"'  "+OpenImage$+" "+TempFolder$+"/temp")
+		elseif(Distort$="Plane2Cylinder")then
+			Angle$=TEXTCONTROL GET$ "TC_angle"
+			Output$=System$("convert "+Type$+" Plane2Cylinder "+Angle$+"  "+OpenImage$+" "+TempFolder$+"/temp")	
+		elseif(Distort$="Plane2Cylinder")then
+			Angle$=TEXTCONTROL GET$ "TC_angle"
+			Output$=System$("convert "+Type$+" Plane2Cylinder "+Angle$+"  "+OpenImage$+" "+TempFolder$+"/temp")		
+		elseif(Distort$="Polar")then
+			RadiusMax$=TEXTCONTROL GET$ "TC_radiusmax"
+			RadiusMin$=TEXTCONTROL GET$ "TC_radiusmin"
+			CenterX$=TEXTCONTROL GET$ "TC_centerx"
+			CenterY$=TEXTCONTROL GET$ "TC_centery"
+			StartAngle$=TEXTCONTROL GET$ "TC_anglestart"
+			EndAngle$=TEXTCONTROL GET$ "TC_angleend"
+			Output$=System$("convert "+Type$+" Polar '"+RadiusMax$+" "+RadiusMin$+" "+CenterX$+","+CenterY$+" "+StartAngle$+","+EndAngle$+"'  "+OpenImage$+" "+TempFolder$+"/temp")
+		elseif(Distort$="Shepards")then	
+			Position1$=TEXTCONTROL GET$ "TC_position1"
+			if(trim$(Position1$)="")then
+				Position1$="0,0"
+			endif
+			NewPosition1$=TEXTCONTROL GET$ "TC_newposition1"
+			if(trim$(NewPosition1$)="")then
+				NewPosition1$="0,0"
+			endif
+			Position2$=TEXTCONTROL GET$ "TC_position2"
+			if(trim$(Position2$)="")then
+				Position2$="0,0"
+			endif
+			NewPosition2$=TEXTCONTROL GET$ "TC_newposition2"
+			if(trim$(NewPosition2$)="")then
+				NewPosition2$="0,0"
+			endif	
+			Output$=System$("convert "+Type$+" Shepards "+"\""+Position1$+" "+NewPosition1$+" "+Position2$+" "+NewPosition2$+"\""+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		elseif(Distort$="SRT")then
+			X$=TEXTCONTROL GET$ "TC_x"
+			if(trim$(X$)="")then
+				X$="0"
+			endif
+			Y$=TEXTCONTROL GET$ "TC_y"
+			if(trim$(Y$)="")then
+				Y$="0"
+			endif
+			if(Y$="0" and  X$="0")then
+				XY$=""
+			else
+				XY$=X$+","+Y$
+			endif
+			ScaleX$=TEXTCONTROL GET$ "TC_scalex"
+			if(trim$(ScaleX$)="")then
+				ScaleX$="0"
+			endif
+			ScaleY$=TEXTCONTROL GET$ "TC_scaley"
+			if(trim$(ScaleY$)="")then
+				ScaleY$="0"
+			endif
+			if(ScaleY$="0" and  ScaleX$="0")then
+				ScaleXY$=""
+			else
+				ScaleXY$=ScaleX$+","+ScaleY$
+			endif
+			Angle$=TEXTCONTROL GET$ "TC_angle"
+			if(trim$(Angle$)="")then
+				Angle$="0"
+			endif
+			NewX$=TEXTCONTROL GET$ "TC_newx"
+			if(trim$(NewX$)="")then
+				NewX$="0"
+			endif
+			NewY$=TEXTCONTROL GET$ "TC_newy"
+			if(trim$(NewY$)="")then
+				NewY$="0"
+			endif		
+			if(NewY$="0" and  NewX$="0")then
+				NewXY$=""
+			else
+				NewXY$=NewX$+","+NewY$
+			endif	
+			Output$=System$("convert "+Type$+" SRT "+"\""+XY$+" "+ScaleXY$+" "+Angle$+" "+NewXY$+"\""+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		endif
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_distort", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break			
+	
+	
+	//edge	
+	case  "VI_Menu2:Effects:edge|"
+		InputView$="edge"
+		InputView()
+		Description$="edge"
+		ReadoutDescription()
+		break
+		
+	case"BT_edge|"	
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_edge", "Enabled", false 	
+		Factor$=TEXTCONTROL GET$ "TC_factor"
+		Output$=System$("mogrify -edge "+Factor$+" "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_edge", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break					
+	
+	//emboss	
+	case  "VI_Menu2:Effects:emboss|"
+		InputView$="emboss"
+		InputView()
+		Description$="emboss"
+		ReadoutDescription()
+		break
+		
+	case"BT_emboss|"	
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_emboss", "Enabled", false 	
+		Radius$=TEXTCONTROL GET$ "TC_Radius"
+		Sigma$=TEXTCONTROL GET$ "TC_Sigma"		
+		Output$=System$("mogrify -emboss "+Radius$+","+Sigma$+" "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_emboss", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	//gaussian-blur	
+	case  "VI_Menu2:Blurring:gaussian-blur|"
+		InputView$="gaussian-blur"
+		InputView()
+		Description$="gaussian-blur"
+		ReadoutDescription()
+		break	
+		
+	case"BT_gaussian-blur|"	
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_gaussian-blur", "Enabled", false 	
+		Radius$=TEXTCONTROL GET$ "TC_radius"
+		Sigma$=TEXTCONTROL GET$ "TC_sigma"		
+		Output$=System$("mogrify -gaussian-blur "+Radius$+"x"+Sigma$+" "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_gaussian-blur", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break		
+			
+		
+	//kuwahara	
+	case  "VI_Menu2:Effects:kuwahara|"
+		InputView$="kuwahara"
+		InputView()
+		Description$="kuwahara"
+		ReadoutDescription()
+		break	
+		
+	case"BT_kuwahara|"	
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_kuwahara", "Enabled", false 	
+		Radius$=TEXTCONTROL GET$ "TC_radius"
+		Sigma$=TEXTCONTROL GET$ "TC_sigma"		
+		Output$=System$("mogrify -kuwahara "+Radius$+"x"+Sigma$+" "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_kuwahara", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break		
+		
+	//mean-shift
+	case"VI_Menu2:Colors:mean-shift|"
+		InputView$="mean-shift"
+		InputView()
+		Description$="mean-shift"
+		ReadoutDescription()
+		break
+		
+	case"BT_mean-shift|"	
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_mean-shift", "Enabled", false 	
+		Width$=TEXTCONTROL GET$ "TC_width"
+		Height$=TEXTCONTROL GET$ "TC_height"	
+		Distance$=TEXTCONTROL GET$ "TC_distance"		
+		Output$=System$("mogrify -mean-shift "+Width$+"x"+Height$+"+"+Distance$+" "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_mean-shift", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	//median	
+	case"VI_Menu2:Effects:median|"
+		InputView$="median"
+		InputView()
+		Description$="median"
+		ReadoutDescription()
+		break
+	
+	case"BT_median|"	
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_median", "Enabled", false 	
+		Geometry$=TEXTCONTROL GET$ "TC_geometry"	
+		Output$=System$("mogrify -median "+Geometry$+" "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_median", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+		
+	//ordered-dither
+	case"VI_Menu2:Effects:ordered-dither|"	
+		InputView$="ordered-dither"
+		InputView()
+		Description$="ordered-dither"
+		ReadoutDescription()
+		break	
+	
+	case "DB_threshold-maps:"+PartTwo$+"|"
+		ThresholdMap$=PartTwo$
+		break
+	
+	case "BT_ordered-dither|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_ordered-dither", "Enabled", false 	
+		//ThresholdMap$ set by dropbox DB_threshold-maps
+		Output$=System$("mogrify -ordered-dither "+ThresholdMap$+" "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_ordered-dither", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	//orient
+	case"VI_Menu2:Align:orient|"	
+		InputView$="orient"
+		InputView()
+		Description$="orient"
+		ReadoutDescription()
+		break	
+	
+	case "DB_orientation:"+PartTwo$+"|"
+		Orientation$=PartTwo$
+		break
+	
+	case "BT_orient|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_orient", "Enabled", false 	
+		Output$=System$("mogrify -orient "+Orientation$+" "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_orient", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+			
+	//paint
+	case"VI_Menu2:Effects:paint|"	
+		InputView$="paint"
+		InputView()
+		Description$="paint"
+		ReadoutDescription()
+		break
+			
+	case "BT_paint|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_paint", "Enabled", false 	
+		Radius$=TEXTCONTROL GET$ "TC_Radius"	
+		Output$=System$("mogrify -paint "+Radius$+" "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_paint", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+	
+	//polaroid
+	case"VI_Menu2:Effects:polaroid|"	
+		InputView$="polaroid"
+		InputView()
+		Description$="polaroid"
+		ReadoutDescription()
+		break
+		
+	case "BT_polaroid|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_polaroid", "Enabled", false 		
+		Output$=System$("mogrify -polaroid "+Angle$+" "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_polaroid", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+	
+	case "SL_polaroid-angle:"+PartTwo$+"|"
+		Angle$=PartTwo$
+		DRAW FLUSH "VI_InputSet"
+		DRAW TEXT 5,15, "angle:        "+PartTwo$, "VI_InputSet"
+		break
+		
+	//radial-blur
+	case  "VI_Menu2:Blurring:radial-blur|"
+		InputView$="radial-blur"
+		InputView()
+		Description$="radial-blur"
+		ReadoutDescription()
+		break	
+		
+	case "BT_radial-blur|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_radial-blur", "Enabled", false 	
+		Angle$=TEXTCONTROL GET$ "TC_angle"
+		Output$=System$("convert -radial-blur "+Angle$+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_radial-blur", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+	
+	
+			
+	
+	//raise
+	case  "VI_Menu2:Effects:raise|"
+		InputView$="raise"
+		InputView()
+		Description$="raise"
+		ReadoutDescription()
+		break	
+	
+	case "BT_raise|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_raise", "Enabled", false 	
+		X$=TEXTCONTROL GET$ "TC_X"
+		Y$=TEXTCONTROL GET$ "TC_Y"	
+		Output$=System$("mogrify -raise "+X$+"x"+Y$+"  "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_raise", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	//roll
+	case  "VI_Menu2:Effects:roll|"
+		InputView$="roll"
+		InputView()
+		Description$="roll"
+		ReadoutDescription()
+		break	
+	
+	case "BT_roll|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_roll", "Enabled", false 	
+		X$=TEXTCONTROL GET$ "TC_X"
+		Y$=TEXTCONTROL GET$ "TC_Y"	
+		Output$=System$("mogrify -roll "+xroll$+X$+yroll$+Y$+"  "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_roll", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+		
+	case "CB_xrollset1:"+PartTwo$+"|"
+	case "CB_xrollset2:"+PartTwo$+"|"
+	case "CB_yrollset1:"+PartTwo$+"|"
+	case "CB_yrollset2:"+PartTwo$+"|"
+		if(PartOne$="CB_xrollset1")then
+			if(PartTwo$="ON")then
+				xroll$="+"
+				CHECKBOX SET "CB_xrollset2", 0
+			else
+				xroll$="-"
+				CHECKBOX SET "CB_xrollset2", 1
+			endif
+		elseif(PartOne$="CB_xrollset2")then
+			if(PartTwo$="ON")then
+				xroll$="-"
+				CHECKBOX SET "CB_xrollset1", 0
+			else
+				xroll$="+"
+				CHECKBOX SET "CB_xrollset1", 1
+			endif
+		elseif(PartOne$="CB_yrollset1")then
+			if(PartTwo$="ON")then
+				yroll$="+"
+				CHECKBOX SET "CB_yrollset2", 0
+			else
+				yroll$="-"
+				CHECKBOX SET "CB_yrollset2", 1
+			endif
+		elseif(PartOne$="CB_yrollset2")then
+			if(PartTwo$="ON")then
+				yroll$="-"
+				CHECKBOX SET "CB_yrollset1", 0
+			else
+				yroll$="+"
+				CHECKBOX SET "CB_yrollset1", 1
+			endif
+		endif
+		break
+		
+	//segment
+	case  "VI_Menu2:Effects:segment|"
+		InputView$="segment"
+		InputView()
+		Description$="segment"
+		ReadoutDescription()
+		break		
+		
+	case "BT_segment|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_segment", "Enabled", false 	
+		CThreshold$=TEXTCONTROL GET$ "TC_cthreshold"
+		SThreshold$=TEXTCONTROL GET$ "TC_sthreshold"	
+		Output$=System$("convert -segment "+CThreshold$+"x"+SThreshold$+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_segment", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+		
+		
+		
+		
+	//sepia-tone
+	case  "VI_Menu2:Effects:sepia-tone|"
+		InputView$="sepia-tone"
+		InputView()
+		Description$="sepia-tone"
+		ReadoutDescription()
+		break	
+		
+	case "BT_sepia-tone|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_sepia-tone", "Enabled", false 	
+		Percent$=TEXTCONTROL GET$ "TC_percent"
+		Threshold$=TEXTCONTROL GET$ "TC_threshold"	
+		Output$=System$("convert -sepia-tone "+Percent$+"-"+Threshold$+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_sepia-tone", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	//shade
+	case  "VI_Menu2:Effects:shade|"
+		InputView$="shade"
+		InputView()
+		Description$="shade"
+		ReadoutDescription()
+		break	
+		
+	case "BT_shade|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_shade", "Enabled", false 	
+		Azimuth$=TEXTCONTROL GET$ "TC_azimuth"
+		Elevation$=TEXTCONTROL GET$ "TC_elevation"	
+		Output$=System$("convert -shade "+Azimuth$+"x"+Elevation$+" "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_shade", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+		
+		
+		
+	//shear
+	case  "VI_Menu2:Effects:shear|"
+		InputView$="shear"
+		InputView()
+		Description$="shear"
+		ReadoutDescription()
+		break	
+	
+	case "BT_shear|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_shear", "Enabled", false 	
+		X$=TEXTCONTROL GET$ "TC_X"
+		Y$=TEXTCONTROL GET$ "TC_Y"	
+		Output$=System$("convert -shear "+X$+"x"+Y$+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_shear", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+		
+	//solarize
+	case  "VI_Menu2:Effects:solarize|"
+		InputView$="solarize"
+		InputView()
+		Description$="solarize"
+		ReadoutDescription()
+		break	
+	
+	case "BT_solarize|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_solarize", "Enabled", false 	
+		Factor$=TEXTCONTROL GET$ "TC_factor"	
+		Output$=System$("convert -solarize "+Factor$+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_solarize", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+		
+	//spread
+	case  "VI_Menu2:Effects:spread|"
+		InputView$="spread"
+		InputView()
+		Description$="spread"
+		ReadoutDescription()
+		break	
+	
+	case "BT_spread|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_spread", "Enabled", false 	
+		Amount$=TEXTCONTROL GET$ "TC_amount"	
+		Output$=System$("convert -spread "+Amount$+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_spread", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	//swirl
+	case  "VI_Menu2:Effects:swirl|"
+		InputView$="swirl"
+		InputView()
+		Description$="swirl"
+		ReadoutDescription()
+		break	
+	
+	case "BT_swirl|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_swirl", "Enabled", false 	
+		Degrees$=TEXTCONTROL GET$ "TC_degrees"	
+		Output$=System$("convert -swirl "+Degrees$+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_swirl", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+	
+	//threshold
+	case  "VI_Menu2:Effects:threshold|"
+		InputView$="threshold"
+		InputView()
+		Description$="threshold"
+		ReadoutDescription()
+		break	
+		
+	case "BT_threshold|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_threshold", "Enabled", false 	
+		Percent$=TEXTCONTROL GET$ "TC_percent"	
+		Output$=System$("convert -threshold "+Percent$+"  "+OpenImage$+" "+TempFolder$+"/temp")
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_threshold", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break	
+		
+	
+	//wave
+	case  "VI_Menu2:Effects:wave|"
+		InputView$="wave"
+		InputView()
+		Description$="wave"
+		ReadoutDescription()
+		break
+	
+	case "BT_wave|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_wave", "Enabled", false 	
+		Amplitude$=TEXTCONTROL GET$ "TC_amplitude"
+		Wavelength$=TEXTCONTROL GET$ "TC_wavelength"	
+		Output$=System$("mogrify -wave "+Amplitude$+"x"+Wavelength$+"  "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_wave", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	//wavelet-denoise
+	case  "VI_Menu2:Effects:wavelet-denoise|"
+		InputView$="wavelet-denoise"
+		InputView()
+		Description$="wavelet-denoise"
+		ReadoutDescription()
+		break
+	
+	case "BT_wavelet-denoise|"
+		Info$="Please wait. working in progress!"
+		Info()
+		DeactivateMenuItems()
+		OPTION SET "BT_wavelet-denoise", "Enabled", false 	
+		Threshold$=TEXTCONTROL GET$ "TC_threshold"
+		Softness$=TEXTCONTROL GET$ "TC_softness"	
+		Output$=System$("mogrify -wavelet-denoise "+Threshold$+"x"+Softness$+"  "+OpenImage$)
+		OpenImage$=TempFolder$+"/temp"
+		DrawView$="right"
+		DrawImage()	
+		undo=undo+1
+		Output$=System$("cp "+TempFolder$+"/temp "+TempFolder$+"/undo"+str$(undo))
+		OPTION SET "BT_wavelet-denoise", "Enabled", true 	
+		Info$="Ready"
+		Info()
+		ActivateMenuItems()
+		break
+	
+	default:
+
+	end switch
+
+	if(window count<1) inloop = false
+
+	sleep 0.1
+wend
+
+sub DrawImage()
+	dim ImageInfo$(1)
+		Output$=System$("mogrify -auto-orient "+TempFolder$+"/temp")
+		Identify$=System$("identify "+TempFolder$+"/temp")
+		splitting=split(Identify$, ImageInfo$(), " ")
+		BITMAP REMOVE "BM_Image"
+		dim ImageSize$(1)
+			splitting=split(ImageInfo$(3), ImageSize$(), "x")
+			OpenImageX=val(ImageSize$(1))
+			OpenImageY=val(ImageSize$(2))
+			
+			dim ImageSmalInfo$(1)
+			dim ImageSmalSize$(1)
+			if(OpenImageX>OpenImageY)then
+				Output$=System$("convert "+TempFolder$+"/temp  -resize "+str$(BitmapSize)+" "+TempFolder$+"/size")
+				Identify$=System$("identify "+TempFolder$+"/size")
+					splitting=split(Identify$, ImageSmalInfo$(), " ")
+					splitting=split(ImageSmalInfo$(3), ImageSmalSize$(), "x")
+					BitmapX2=val(ImageSmalSize$(1))
+					BitmapY2=val(ImageSmalSize$(2))
+			elseif(OpenImageY>OpenImageX)then
+				Output$=System$("convert "+TempFolder$+"/temp  -resize "+str$(BitmapSize)+" "+TempFolder$+"/size")
+				Output$=System$("mogrify -auto-orient "+TempFolder$+"/size")
+				Identify$=System$("identify "+TempFolder$+"/size")
+					splitting=split(Identify$, ImageSmalInfo$(), " ")
+					splitting=split(ImageSmalInfo$(3), ImageSmalSize$(), "x")
+					BitmapX2=val(ImageSmalSize$(2))
+					BitmapY2=val(ImageSmalSize$(1))	
+			elseif(OpenImageY=OpenImageX)then
+				Output$=System$("convert "+TempFolder$+"/temp  -resize "+str$(BitmapSize)+" "+TempFolder$+"/size")
+				Output$=System$("mogrify -auto-orient "+TempFolder$+"/size")
+				Identify$=System$("identify "+TempFolder$+"/size")
+					splitting=split(Identify$, ImageSmalInfo$(), " ")
+					splitting=split(ImageSmalInfo$(3), ImageSmalSize$(), "x")
+					BitmapX2=val(ImageSmalSize$(2))
+					BitmapY2=val(ImageSmalSize$(1))	
+			endif
+			Output$=System$("rm -r "+TempFolder$+"/size")				
+
+			BITMAP BitmapX2,BitmapY2, "BM_Image"
+			Err = DRAW IMAGE 0,0 TO BitmapX2,BitmapY2, OpenImage$, "BM_Image"
+			if(DrawView$="right")then
+				DRAW FLUSH "VI_ImageRight"	
+				DRAW BITMAP BitmapSize/2-BitmapX2/2,BitmapSize/2-BitmapY2/2 TO BitmapSize/2+BitmapX2/2,BitmapSize/2+BitmapY2/2, "BM_Image", "copy", "VI_ImageRight"
+			elseif(DrawView$="left")then
+				DRAW FLUSH "VI_ImageLeft"	
+				DRAW BITMAP BitmapSize/2-BitmapX2/2,BitmapSize/2-BitmapY2/2 TO BitmapSize/2+BitmapX2/2,BitmapSize/2+BitmapY2/2, "BM_Image", "copy", "VI_ImageLeft"
+				DRAW FLUSH "VI_ImageRight"	
+				DRAW BITMAP BitmapSize/2-BitmapX2/2,BitmapSize/2-BitmapY2/2 TO BitmapSize/2+BitmapX2/2,BitmapSize/2+BitmapY2/2, "BM_Image", "copy", "VI_ImageRight"
+			endif
+			TOOLTIP "VI_ImageRight", OriginalImage$+"\n"+ImageInfo$(2)+"\n"+ImageInfo$(3)+"\n"+ImageInfo$(5)+"\n"+ImageInfo$(6)+"\n"+ImageInfo$(7)			
+end sub
+
+sub InputView()
+	VIEW REMOVE "VI_InputSet"
+	wait 0.5
+	if(InputView$="abstract-oil-paint")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="adaptive-blur")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			//DRAW SET "BGColor",100,100,100,  "VI_InputSet"
+			DRAW TEXT 5,15, "Radius: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_radius", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Sigma: ", "VI_InputSet"	
+				TEXTCONTROL 100,25 TO 240,45, "TC_sigma", "", "", "VI_InputSet"
+		
+			BUTTON 2,117 TO 490,137, "BT_adaptive-blur", "adaptive-blur to image",  "VI_InputSet"
+	elseif(InputView$="adaptive-sharpen")then	
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Radius: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_radius", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Sigma: ", "VI_InputSet"	
+				TEXTCONTROL 100,25 TO 240,45, "TC_sigma", "", "", "VI_InputSet"
+		
+			BUTTON 2,117 TO 490,137, "BT_adaptive-sharpen", "adaptive-sharpen to image",  "VI_InputSet"
+	elseif(InputView$="auto-gamma")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="auto-level")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="auto-orient")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="border")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,17, "X: ", "VI_InputSet"
+				TEXTCONTROL 100,2 TO 240,20, "TC_X", "", "", "VI_InputSet"
+			DRAW TEXT 255,17, "Y: ", "VI_InputSet"
+				TEXTCONTROL 340,2 TO 490,20, "TC_Y", "", "", "VI_InputSet"		
+				COLORCONTROL 5,35, "CC_border", "VI_InputSet"	
+			
+			BUTTON 2,117 TO 490,137, "BT_border", "border to image",  "VI_InputSet"
+	elseif(InputView$="blur")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Radius: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_Radius", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Sigma: ", "VI_InputSet"	
+				TEXTCONTROL 100,25 TO 240,45, "TC_Sigma", "", "", "VI_InputSet"
+		
+			BUTTON 2,117 TO 490,137, "BT_blur", "blur to image",  "VI_InputSet"
+	elseif(InputView$="brightness-contrast")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Brightness: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_brightness", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Contrast: ", "VI_InputSet"	
+				TEXTCONTROL 100,25 TO 240,45, "TC_contrast", "", "", "VI_InputSet"
+		
+			BUTTON 2,117 TO 490,137, "BT_brightness-contrast", "brightness-contrast to image",  "VI_InputSet"
+	elseif(InputView$="channel")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="charcoal")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Factor: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_factor", "", "", "VI_InputSet"
+		
+			BUTTON 2,117 TO 490,137, "BT_charcoal", "charcoal to image",  "VI_InputSet"
+	elseif(InputView$="loop")then		
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Value: ", "VI_InputSet"
+				TEXTCONTROL 90,0 TO 240,20, "TC_value", "", "0", "VI_InputSet"
+			DRAW TEXT 5,45, "Source folder: ", "VI_InputSet"
+				TEXTCONTROL 90,60 TO 460,80, "TC_source_folder", "", "/path/to/pictures/", "VI_InputSet"
+				BUTTON 470,60 TO 490,84, "BT_select_folder", "v",  "VI_InputSet"
+			DRAW TEXT 255,15, "Picture: ", "VI_InputSet"
+				TEXTCONTROL 340,0 TO 490,20, "TC_source_picture", "", "picturename*.jpg", "VI_InputSet"			
+				
+			BUTTON 2,117 TO 490,137, "BT_loop", "create GIF animation",  "VI_InputSet"					
+	elseif(InputView$="collage")then		
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Geometry: ", "VI_InputSet"
+				TEXTCONTROL 90,0 TO 240,20, "TC_geometry", "", "+10+10", "VI_InputSet"
+			DRAW TEXT 5,45, "Tile: ", "VI_InputSet"
+				TEXTCONTROL 90,30 TO 240,50, "TC_tile", "", "2x2", "VI_InputSet"
+			DRAW TEXT 5,75, "Source folder: ", "VI_InputSet"
+				TEXTCONTROL 90,60 TO 460,80, "TC_source_folder", "", "/path/to/pictures/", "VI_InputSet"
+				BUTTON 470,60 TO 490,84, "BT_select_folder", "v",  "VI_InputSet"
+			DRAW TEXT 255,15, "Picture: ", "VI_InputSet"
+				TEXTCONTROL 340,0 TO 490,20, "TC_source_picture", "", "picturename*.jpg", "VI_InputSet"			
+				
+			BUTTON 2,117 TO 490,137, "BT_collage", "create collage",  "VI_InputSet"
+	elseif(InputView$="append")then		
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Type: ", "VI_InputSet"
+				DROPBOX 90,0 TO 240,25, "DB_append", "",  "VI_InputSet"
+					DROPBOX ADD "DB_append","horizontal"
+					DROPBOX ADD "DB_append", "vertical"
+			DRAW TEXT 5,45, "Source folder: ", "VI_InputSet"
+				TEXTCONTROL 90,30 TO 460,50, "TC_source_folder", "", "/path/to/pictures/", "VI_InputSet"
+				BUTTON 470,30 TO 490,54, "BT_select_folder", "v",  "VI_InputSet"
+			DRAW TEXT 255,15, "Suffix of source images: ", "VI_InputSet"
+				TEXTCONTROL 400,0 TO 490,20, "TC_suffix", "", "*.jpg", "VI_InputSet"			
+				
+			BUTTON 2,117 TO 490,137, "BT_append", "create collage",  "VI_InputSet"
+	elseif(InputView$="splitimage")then		
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "X(%): ", "VI_InputSet"
+				SLIDER 100,0 TO 240,20, "SL_percentX", "", 1, 100, "VI_InputSet"				
+			DRAW TEXT 5,40, "Y(%): ", "VI_InputSet"
+				SLIDER 100,30 TO 240,50, "SL_percentY", "", 1, 100, "VI_InputSet"	
+			BUTTON 2,117 TO 490,137, "BT_splitimage", "Split image into tiles",  "VI_InputSet"
+	elseif(InputView$="colors")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Colors: ", "VI_InputSet"
+				//TEXTCONTROL 100,0 TO 240,20, "TC_colors", "", "", "VI_InputSet"
+				SLIDER 100,0 TO 240,20, "SL_colors", "", 1, 256, "VI_InputSet"
+			BUTTON 2,117 TO 490,137, "BT_colors", "colors to image",  "VI_InputSet"
+	elseif(InputView$="colorspace")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="colorize")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Color red: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_red", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Color green: ", "VI_InputSet"
+				TEXTCONTROL 100,30 TO 240,50, "TC_green", "", "", "VI_InputSet"
+			DRAW TEXT 5,65, "Color blue: ", "VI_InputSet"
+				TEXTCONTROL 100,60 TO 240,80, "TC_blue", "", "", "VI_InputSet"
+				
+			BUTTON 2,117 TO 490,137, "BT_colorize", "colorize to image",  "VI_InputSet"
+	elseif(InputView$="contrast")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="contrast-stretch")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Black-point: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_black-point", "", "*%", "VI_InputSet"
+			DRAW TEXT 5,40, "White-point: ", "VI_InputSet"	
+				TEXTCONTROL 100,25 TO 240,45, "TC_white-point", "", "*%", "VI_InputSet"
+		
+		BUTTON 2,117 TO 490,137, "BT_contrast-stretch", "contrast-stretch to image",  "VI_InputSet"
+	elseif(InputView$="compress")then	
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="crop")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			if(CropSelection$="percent")then
+				DRAW TEXT 5,15, "Percent: ", "VI_InputSet"
+					SLIDER 100,0 TO 240,20, "SL_percent", "", 0, 100, "VI_InputSet"
+					//TEXTCONTROL 100,0 TO 240,20, "TC_percent", "", "*%", "VI_InputSet"
+				
+				BUTTON 2,117 TO 490,137, "BT_crop", "crop to image",  "VI_InputSet"
+			else
+				DRAW TEXT 5,15, "Width: ", "VI_InputSet"
+					TEXTCONTROL 100,0 TO 240,20, "TC_width", "", "*%", "VI_InputSet"
+				DRAW TEXT 5,45, "Height: ", "VI_InputSet"
+					TEXTCONTROL 100,30 TO 240,50, "TC_height", "", "*%", "VI_InputSet"
+				DRAW TEXT 5,75, "X: ", "VI_InputSet"
+					TEXTCONTROL 100,60 TO 240,80, "TC_x", "", "", "VI_InputSet"	
+				DRAW TEXT 255,15, "Y: ", "VI_InputSet"
+				TEXTCONTROL 340,0 TO 490,20, "TC_y", "", "", "VI_InputSet"	
+										
+				BUTTON 2,117 TO 490,137, "BT_crop", "crop to image",  "VI_InputSet"
+			endif	
+	elseif(InputView$="chop")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "X: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_x", "", "", "VI_InputSet"
+			DRAW TEXT 5,45, "Y: ", "VI_InputSet"
+				TEXTCONTROL 100,30 TO 240,50, "TC_y", "", "", "VI_InputSet"
+			DRAW TEXT 5,75, "Column: ", "VI_InputSet"
+				TEXTCONTROL 100,60 TO 240,80, "TC_column", "", "", "VI_InputSet"
+			DRAW TEXT 5,105, "Row: ", "VI_InputSet"
+				TEXTCONTROL 100,90 TO 240,110, "TC_row", "", "", "VI_InputSet"
+			BUTTON 2,117 TO 490,137, "BT_chop", "chop to image",  "VI_InputSet"					
+	elseif(InputView$="cycle")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Amount: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_amount", "", "", "VI_InputSet"
+		
+			BUTTON 2,117 TO 490,137, "BT_cycle", "cycle to image",  "VI_InputSet"
+	elseif(InputView$="newimagefile")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Width: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 293,20, "TC_width", "", "", "VI_InputSet"
+			DRAW TEXT 5,45, "Height: ", "VI_InputSet"	
+				TEXTCONTROL 100,30 TO 293,50, "TC_height", "", "", "VI_InputSet"
+			DRAW TEXT 5,75, "Color depth: ", "VI_InputSet"	
+				TEXTCONTROL 100,60 TO 240,70, "TC_colordepth", "", "", "VI_InputSet"
+							
+			BUTTON 2,117 TO 490,137, "BT_newimagefile", "create new image",  "VI_InputSet"
+	elseif(InputView$="despeckle")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="edge")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Factor: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_factor", "", "", "VI_InputSet"
+				
+			BUTTON 2,117 TO 490,137, "BT_edge", "edge to image",  "VI_InputSet"
+	elseif(InputView$="distort")then
+		if(Distort$="Affine")then
+			VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+				DRAW TEXT 5,15, "Fuction: ", "VI_InputSet"
+					ThresholdMap$="threshold"
+					DROPBOX 100,0 TO 240,23, "DB_DisortType", "", "VI_InputSet"
+						DROPBOX ADD "DB_DisortType", "+distort"
+						DROPBOX ADD "DB_DisortType", "-distort"
+		
+				DRAW TEXT 5,40, "X: ", "VI_InputSet"
+					TEXTCONTROL 100,25 TO 240,45, "TC_x", "", "", "VI_InputSet"
+				DRAW TEXT 255,40, "Y: ", "VI_InputSet"
+					TEXTCONTROL 340,25 TO 490,45, "TC_y", "", "", "VI_InputSet"
+				
+				DRAW TEXT 5,65, "Scale X: ", "VI_InputSet"
+					TEXTCONTROL 100,50 TO 240,70, "TC_scalex", "", "", "VI_InputSet"	
+				DRAW TEXT 255,65, "Scale Y: ", "VI_InputSet"
+					TEXTCONTROL 340,50 TO 490,70, "TC_scaley", "", "", "VI_InputSet"	
+		elseif(Distort$="Arc")then
+			VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+				DRAW TEXT 5,15, "Fuction: ", "VI_InputSet"
+					ThresholdMap$="threshold"
+					DROPBOX 100,0 TO 240,23, "DB_DisortType", "", "VI_InputSet"
+						DROPBOX ADD "DB_DisortType", "+distort"
+						DROPBOX ADD "DB_DisortType", "-distort"
+		
+				DRAW TEXT 5,40, "Angle: ", "VI_InputSet"
+					TEXTCONTROL 100,25 TO 240,45, "TC_angle", "", "", "VI_InputSet"
+				DRAW TEXT 255,40, "Rotate: ", "VI_InputSet"
+					TEXTCONTROL 340,25 TO 490,45, "TC_rotate", "", "", "VI_InputSet"	
+		elseif(Distort$="Barrel")then
+			VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+				DRAW TEXT 5,15, "Fuction: ", "VI_InputSet"
+					ThresholdMap$="threshold"
+					DROPBOX 100,0 TO 240,23, "DB_DisortType", "", "VI_InputSet"
+						DROPBOX ADD "DB_DisortType", "+distort"
+						DROPBOX ADD "DB_DisortType", "-distort"
+		
+				DRAW TEXT 5,40, "A: ", "VI_InputSet"
+					TEXTCONTROL 100,25 TO 240,45, "TC_a", "", "", "VI_InputSet"
+				DRAW TEXT 255,40, "B: ", "VI_InputSet"
+					TEXTCONTROL 340,25 TO 490,45, "TC_b", "", "", "VI_InputSet"	
+				DRAW TEXT 5,65, "C: ", "VI_InputSet"
+					TEXTCONTROL 100,50 TO 240,70, "TC_c", "", "", "VI_InputSet"
+				DRAW TEXT 255,65, "D: ", "VI_InputSet"
+					TEXTCONTROL 340,50 TO 490,70, "TC_d", "", "", "VI_InputSet"	
+		elseif(Distort$="Cylinder2Plane")then
+			VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+				DRAW TEXT 5,15, "Fuction: ", "VI_InputSet"
+					ThresholdMap$="threshold"
+					DROPBOX 100,0 TO 240,23, "DB_DisortType", "", "VI_InputSet"
+						DROPBOX ADD "DB_DisortType", "+distort"
+						DROPBOX ADD "DB_DisortType", "-distort"
+		
+				DRAW TEXT 5,40, "Angle: ", "VI_InputSet"
+					TEXTCONTROL 100,25 TO 240,45, "TC_angle", "", "", "VI_InputSet"	
+			elseif(Distort$="Plane2Cylinder")then
+			VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+				DRAW TEXT 5,15, "Fuction: ", "VI_InputSet"
+					ThresholdMap$="threshold"
+					DROPBOX 100,0 TO 240,23, "DB_DisortType", "", "VI_InputSet"
+						DROPBOX ADD "DB_DisortType", "+distort"
+						DROPBOX ADD "DB_DisortType", "-distort"
+		
+				DRAW TEXT 5,40, "Angle: ", "VI_InputSet"
+					TEXTCONTROL 100,25 TO 240,45, "TC_angle", "", "", "VI_InputSet"		
+		elseif(Distort$="Polar" or Distort$="DePolar")then
+			VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+				DRAW TEXT 5,15, "Fuction: ", "VI_InputSet"
+					ThresholdMap$="threshold"
+					DROPBOX 100,0 TO 240,23, "DB_DisortType", "", "VI_InputSet"
+						DROPBOX ADD "DB_DisortType", "+distort"
+						DROPBOX ADD "DB_DisortType", "-distort"
+						
+				DRAW TEXT 5,40, "Radius Max: ", "VI_InputSet"
+					TEXTCONTROL 100,25 TO 240,45, "TC_radiusmax", "", "", "VI_InputSet"	
+				DRAW TEXT 255,40, "Radius Min: ", "VI_InputSet"
+					TEXTCONTROL 340,25 TO 490,45, "TC_radiusmin", "", "", "VI_InputSet"	
+					
+				DRAW TEXT 5,65, "Center X: ", "VI_InputSet"
+					TEXTCONTROL 100,50 TO 240,70, "TC_centerx", "", "", "VI_InputSet"	
+				DRAW TEXT 255,65, "Center Y: ", "VI_InputSet"
+					TEXTCONTROL 340,50 TO 490,70, "TC_centery", "", "", "VI_InputSet"	
+				
+				DRAW TEXT 5,90, "Start Angle: ", "VI_InputSet"
+					TEXTCONTROL 100,75 TO 240,95, "TC_anglestart", "", "", "VI_InputSet"	
+				DRAW TEXT 255,90, "End Angle: ", "VI_InputSet"
+					TEXTCONTROL 340,75 TO 490,95, "TC_angleend", "", "", "VI_InputSet"
+		elseif(Distort$="Shepards")then
+			VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+				DRAW TEXT 5,15, "Fuction: ", "VI_InputSet"
+					ThresholdMap$="threshold"
+					DROPBOX 100,0 TO 240,23, "DB_DisortType", "", "VI_InputSet"
+						DROPBOX ADD "DB_DisortType", "+distort"
+						DROPBOX ADD "DB_DisortType", "-distort"
+						
+				DRAW TEXT 5,40, "Positon 1: ", "VI_InputSet"
+					TEXTCONTROL 100,25 TO 240,45, "TC_position1", "", "*,*", "VI_InputSet"
+				DRAW TEXT 255,40, "New Positon 1: ", "VI_InputSet"
+					TEXTCONTROL 340,25 TO 490,45, "TC_newposition1", "", "*,*", "VI_InputSet"
+				
+				DRAW TEXT 5,65, "Positon 2: ", "VI_InputSet"
+					TEXTCONTROL 100,50 TO 240,70, "TC_position2", "", "*,*", "VI_InputSet"	
+				DRAW TEXT 255,65, "New Positon 2: ", "VI_InputSet"
+					TEXTCONTROL 340,50 TO 490,70, "TC_newposition2", "", "*,*", "VI_InputSet"												
+		elseif(Distort$="SRT")then
+			VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+				DRAW TEXT 5,15, "Fuction: ", "VI_InputSet"
+					ThresholdMap$="threshold"
+					DROPBOX 100,0 TO 240,23, "DB_DisortType", "", "VI_InputSet"
+						DROPBOX ADD "DB_DisortType", "+distort"
+						DROPBOX ADD "DB_DisortType", "-distort"
+				
+				DRAW TEXT 255,15, "Angle: ", "VI_InputSet"
+					TEXTCONTROL 340,0 TO 490,25, "TC_angle", "", "", "VI_InputSet"	
+		
+				DRAW TEXT 5,40, "X: ", "VI_InputSet"
+					TEXTCONTROL 100,25 TO 240,45, "TC_x", "", "", "VI_InputSet"
+				DRAW TEXT 255,40, "Y: ", "VI_InputSet"
+					TEXTCONTROL 340,25 TO 490,45, "TC_y", "", "", "VI_InputSet"
+				
+				DRAW TEXT 5,65, "Scale X: ", "VI_InputSet"
+					TEXTCONTROL 100,50 TO 240,70, "TC_scalex", "", "", "VI_InputSet"	
+				DRAW TEXT 255,65, "Scale Y: ", "VI_InputSet"
+					TEXTCONTROL 340,50 TO 490,70, "TC_scaley", "", "", "VI_InputSet"	
+				
+				DRAW TEXT 5,90, "New X: ", "VI_InputSet"
+					TEXTCONTROL 100,75 TO 240,95, "TC_newx", "", "", "VI_InputSet"	
+				DRAW TEXT 255,90, "New Y: ", "VI_InputSet"
+					TEXTCONTROL 340,75 TO 490,95, "TC_newy", "", "", "VI_InputSet"		
+		endif	
+		BUTTON 2,117 TO 490,137, "BT_distort", "distort to image",  "VI_InputSet"				
+	elseif(InputView$="enhance")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="equalize")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"			
+	elseif(InputView$="emboss")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Radius: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_Radius", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Sigma: ", "VI_InputSet"	
+				TEXTCONTROL 100,25 TO 240,45, "TC_Sigma", "", "", "VI_InputSet"
+		
+		BUTTON 2,117 TO 490,137, "BT_emboss", "emboss to image",  "VI_InputSet"
+	elseif(InputView$="evaluate-gaussian-noise"	)then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Value: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_value", "", "", "VI_InputSet"
+		
+		BUTTON 2,117 TO 490,137, "BT_evaluate-gaussian-noise", "Gaussian-noise to image",  "VI_InputSet"
+	elseif(InputView$="flip")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="flop")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="gamma-all")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Gamma: ", "VI_InputSet"
+				SLIDER 100,0 TO 240,20, "SL_gamma", "", 80, 230, "VI_InputSet"
+				//TEXTCONTROL 100,0 TO 293,20, "TC_gamma", "", "", "VI_InputSet"		
+		BUTTON 2,117 TO 490,137, "BT_gamma-all", "gamma to image",  "VI_InputSet"
+	elseif(InputView$="gamma-rgb")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Red: ", "VI_InputSet"
+				SLIDER 100,0 TO 240,20, "SL_red", "", 80, 230, "VI_InputSet"
+				//TEXTCONTROL 100,0 TO 240,20, "TC_red", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Green: ", "VI_InputSet"
+				SLIDER 100,25 TO 240,45, "SL_green", "", 80, 230, "VI_InputSet"
+				//TEXTCONTROL 100,25 TO 240,45, "TC_green", "", "", "VI_InputSet"
+			DRAW TEXT 5,65, "Blue: ", "VI_InputSet"
+				SLIDER 100,50 TO 240,70, "SL_blue", "", 80, 230, "VI_InputSet"
+				//TEXTCONTROL 100,50 TO 240,70, "TC_blue", "", "", "VI_InputSet"
+		
+		BUTTON 2,117 TO 490,137, "BT_gamma-rgb", "gamma to image",  "VI_InputSet"
+	elseif(InputView$="gaussian-blur")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Radius: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_radius", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Sigma: ", "VI_InputSet"
+				TEXTCONTROL 100,25 TO 240,45, "TC_sigma", "", "", "VI_InputSet"
+		
+		BUTTON 2,117 TO 490,137, "BT_gaussian-blur", "gaussian-blur to image",  "VI_InputSet"
+	elseif(InputView$="grayscale")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"	
+	elseif(InputView$="interlace")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"		
+	elseif(InputView$="implode")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Amount: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_amount", "", "", "VI_InputSet"
+	
+		BUTTON 2,117 TO 490,137, "BT_implode", "implode to image",  "VI_InputSet"
+	elseif(InputView$="kuwahara")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Radius: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_radius", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Sigma: ", "VI_InputSet"
+				TEXTCONTROL 100,25 TO 240,45, "TC_sigma", "", "", "VI_InputSet"
+		
+		BUTTON 2,117 TO 490,137, "BT_kuwahara", "kuwahara to image",  "VI_InputSet"
+	elseif(InputView$="level")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "White Point: ", "VI_InputSet"
+				SLIDER 140,0 TO 240,20, "SL_whitepoint", "", 0, 100, "VI_InputSet"
+			DRAW TEXT 5,40, "Black Point: ", "VI_InputSet"
+				SLIDER 140,30 TO 240,50, "SL_blackpoint", "", 0, 100, "VI_InputSet"
+	
+		BUTTON 2,117 TO 490,137, "BT_level", "level to image",  "VI_InputSet"		
+	elseif(InputView$="magnify")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"			
+	elseif(InputView$="mean-shift")then	
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Width: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_width", "", "", "VI_InputSet"
+			DRAW TEXT 5,45, "Height: ", "VI_InputSet"
+				TEXTCONTROL 100,30 TO 240,50, "TC_height", "", "", "VI_InputSet"
+			DRAW TEXT 5,75, "Distance: ", "VI_InputSet"
+				TEXTCONTROL 100,60 TO 240,80, "TC_distance", "", "*%", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_mean-shift", "mean-shift to image",  "VI_InputSet"
+	elseif(InputView$="median")then	
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Geometry: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_geometry", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_median", "mediant to image",  "VI_InputSet"						
+	elseif(InputView$="modulate")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Value: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_value", "", "", "VI_InputSet"
+	
+		BUTTON 2,117 TO 490,137, "BT_modulate", "modulate to image",  "VI_InputSet"	
+	elseif(InputView$="modulate-hue")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Value 1: ", "VI_InputSet"
+				//SLIDER 100,0 TO 240,20, "SL_value1", "", 0, 100, "horizontal", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_value1", "", "", "VI_InputSet"
+			DRAW TEXT 5,45, "Value 2: ", "VI_InputSet"			
+				//SLIDER 100,30 TO 240,50, "SL_value2", "", 0, 100, "horizontal", "VI_InputSet"
+				TEXTCONTROL 100,30 TO 240,50, "TC_value2", "", "", "VI_InputSet"
+			DRAW TEXT 5,75, "Hue: ", "VI_InputSet"				
+				//SLIDER 100,60 TO 240,60, "SL_hue", "", 0.0, 200, "triangle", "VI_InputSet"
+				TEXTCONTROL 100,60 TO 240,80, "TC_hue", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_modulate-hue", "modulate-hue to image",  "VI_InputSet"			
+	elseif(InputView$="monochrome")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="motion-blur")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Radius: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_radius", "", "", "VI_InputSet"
+			DRAW TEXT 5,45, "Sigma: ", "VI_InputSet"	
+				TEXTCONTROL 100,30 TO 240,50, "TC_sigma", "", "", "VI_InputSet"
+			DRAW TEXT 5,75, "Angle: ", "VI_InputSet"	
+				TEXTCONTROL 100,60 TO 240,80, "TC_angle", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_motion-blur", "motion-blur to image",  "VI_InputSet"
+	elseif(InputView$="negate")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"	
+	elseif(InputView$="noise")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Noise: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_noise", "", "", "VI_InputSet"
+	
+		BUTTON 2,117 TO 490,137, "BT_noise", "noise to image",  "VI_InputSet"
+	elseif(InputView$="normalize")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="ordered-dither")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Threshold Map: ", "VI_InputSet"
+				ThresholdMap$="threshold"
+				DROPBOX 100,0 TO 240,20, "DB_threshold-maps", "", "VI_InputSet"
+					DROPBOX ADD "DB_threshold-maps", "threshold"
+					DROPBOX ADD "DB_threshold-maps", "checks"
+					DROPBOX ADD "DB_threshold-maps", "o2x2"
+					DROPBOX ADD "DB_threshold-maps", "o3x3"
+					DROPBOX ADD "DB_threshold-maps", "o4x4"
+					DROPBOX ADD "DB_threshold-maps", "o8x8"
+					DROPBOX ADD "DB_threshold-maps", "h3x4a"
+					DROPBOX ADD "DB_threshold-maps", "h6x6a"
+					DROPBOX ADD "DB_threshold-maps", "h8x8a"
+					DROPBOX ADD "DB_threshold-maps", "h3x4o"
+					DROPBOX ADD "DB_threshold-maps", "h6x6o"
+					DROPBOX ADD "DB_threshold-maps", "h8x8o"
+					DROPBOX ADD "DB_threshold-maps", "h16x16o"
+					DROPBOX ADD "DB_threshold-maps", "c5x5b"
+					DROPBOX ADD "DB_threshold-maps", "c5x5w"
+					DROPBOX ADD "DB_threshold-maps", "c6x6b"
+					DROPBOX ADD "DB_threshold-maps", "c6x6w"
+					DROPBOX ADD "DB_threshold-maps", "c7x7b"
+					DROPBOX ADD "DB_threshold-maps", "c7x7w"
+			
+			BUTTON 2,117 TO 490,137, "BT_ordered-dither", "ordered-dither to image",  "VI_InputSet"	
+	elseif(InputView$="orient")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Orientation: ", "VI_InputSet"
+				Orientation$="top-left"
+				DROPBOX 100,0 TO 240,20, "DB_orientation", "", "VI_InputSet"
+					DROPBOX ADD "DB_orientation", "bottom-left"
+					DROPBOX ADD "DB_orientation", "bottom-right"
+					DROPBOX ADD "DB_orientation", "left-bottom"
+					DROPBOX ADD "DB_orientation", "left-top"
+					DROPBOX ADD "DB_orientation", "right-bottom"
+					DROPBOX ADD "DB_orientation", "right-top"
+					DROPBOX ADD "DB_orientation", "top-left"
+					DROPBOX ADD "DB_orientation", "top-right"
+					DROPBOX ADD "DB_orientation", "undefined"			
+			BUTTON 2,117 TO 490,137, "BT_orient", "orient to image",  "VI_InputSet"	
+	elseif(InputView$="resample")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "X: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_x", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Y: ", "VI_InputSet"	
+				TEXTCONTROL 100,30 TO 240,50, "TC_y", "", "", "VI_InputSet"
+							
+			BUTTON 2,117 TO 490,137, "BT_resample", "resample to image",  "VI_InputSet"			
+	elseif(InputView$="resize")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Width: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_width", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Height: ", "VI_InputSet"	
+				TEXTCONTROL 100,30 TO 240,50, "TC_height", "", "", "VI_InputSet"
+							
+			BUTTON 2,117 TO 490,137, "BT_resize", "resize to image",  "VI_InputSet"
+	elseif(InputView$="rotate")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+	elseif(InputView$="sharpen")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Factor: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_factor", "", "", "VI_InputSet"
+		
+			BUTTON 2,117 TO 490,137, "BT_sharpen", "sharpen to image",  "VI_InputSet"
+	elseif(InputView$="sigmoidal-contrast")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,17, "Value: ", "VI_InputSet"
+				TEXTCONTROL 100,2 TO 240,20, "TC_value", "", "", "VI_InputSet"
+			DRAW TEXT 255,17, "Percent: ", "VI_InputSet"
+				TEXTCONTROL 340,2 TO 490,20, "TC_percent", "", "*%", "VI_InputSet"		
+			
+			BUTTON 2,117 TO 490,137, "BT_sigmoidal-contrast", "sigmoidal-contrast to image",  "VI_InputSet"						
+	elseif(InputView$="unsharp")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Radius: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_Radius", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Sigma: ", "VI_InputSet"	
+				TEXTCONTROL 100,25 TO 240,45, "TC_Sigma", "", "", "VI_InputSet"
+			DRAW TEXT 5,65, "Amount: ", "VI_InputSet"	
+				TEXTCONTROL 100,50 TO 240,70, "TC_Amount", "", "", "VI_InputSet"
+			DRAW TEXT 255,15, "Threshold: ", "VI_InputSet"
+				TEXTCONTROL 340,0 TO 490,20,  "TC_Threshold", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_unsharp", "unsharp to image",  "VI_InputSet"
+	elseif(InputView$="vignette")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,17, "X: ", "VI_InputSet"
+				TEXTCONTROL 100,2 TO 240,20, "TC_X", "", "", "VI_InputSet"
+			DRAW TEXT 255,17, "Y: ", "VI_InputSet"
+				TEXTCONTROL 340,2 TO 490,20, "TC_Y", "", "", "VI_InputSet"		
+				COLORCONTROL 5,35, "CC_vignette", "VI_InputSet"	
+			
+			BUTTON 2,117 TO 490,137, "BT_vignette", "vignette to image",  "VI_InputSet"
+	elseif(InputView$="paint")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Radius: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_Radius", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_paint", "paint to image",  "VI_InputSet"
+	elseif(InputView$="polaroid")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Angle: ", "VI_InputSet"
+				SLIDER 100,0 TO 240,20, "SL_polaroid-angle", "", -15, 15, "VI_InputSet"	
+			
+			BUTTON 2,117 TO 490,137, "BT_polaroid", "polaroid to image",  "VI_InputSet"
+	elseif(InputView$="radial-blur")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Angle: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_angle", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_radial-blur", "radial-blur to image",  "VI_InputSet"		
+	elseif(InputView$="raise")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "X: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_X", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Y: ", "VI_InputSet"	
+				TEXTCONTROL 100,25 TO 240,45, "TC_Y", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_raise", "raise to image",  "VI_InputSet"
+	elseif(InputView$="roll")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			xroll$="+"
+			yroll$="+"
+			DRAW TEXT 5,15, "X: ", "VI_InputSet"
+				CHECKBOX 100,0, "CB_xrollset1", "+", 1, "VI_InputSet"
+				CHECKBOX 150,0, "CB_xrollset2", "-", 0, "VI_InputSet"
+				TEXTCONTROL 190,0 TO 240,20, "TC_X", "", "", "VI_InputSet"
+				DRAW TEXT 5,40, "Y: ", "VI_InputSet"	
+				CHECKBOX 100,25, "CB_yrollset1", "+", 1, "VI_InputSet"
+				CHECKBOX 150,25, "CB_yrollset2", "-", 0, "VI_InputSet"
+				TEXTCONTROL 190,25 TO 240,45, "TC_Y", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_roll", "roll to image",  "VI_InputSet"
+	elseif(InputView$="scale")then
+		VIEW 5,8 TO 498,158,  "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Width: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_width", "", "", "VI_InputSet"
+			DRAW TEXT 5,45, "Height: ", "VI_InputSet"	
+				TEXTCONTROL 100,30 TO 240,50, "TC_height", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_scale", "scale image",  "VI_InputSet"					
+	elseif(InputView$="selective-blur")then
+		VIEW 5,8 TO 498,158,  "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Radius: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_radius", "", "", "VI_InputSet"
+			DRAW TEXT 5,45, "Sigma: ", "VI_InputSet"	
+				TEXTCONTROL 100,30 TO 240,50, "TC_sigma", "", "", "VI_InputSet"
+			DRAW TEXT 5,75, "Threshold: ", "VI_InputSet"	
+				TEXTCONTROL 100,60 TO 240,80, "TC_threshold", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_selective-blur", "selective-blur to image",  "VI_InputSet"
+	elseif(InputView$="segment")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Clustering Threshold: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_cthreshold", "", "", "VI_InputSet"
+			DRAW TEXT 5,45, "Smoothing Threshold: ", "VI_InputSet"	
+				TEXTCONTROL 100,30 TO 240,50, "TC_sthreshold", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_segment", "segment to image",  "VI_InputSet"			
+	elseif(InputView$="sepia-tone")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Percent: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_percent", "", "*.%", "VI_InputSet"
+			DRAW TEXT 5,45, "Threshold: ", "VI_InputSet"	
+				TEXTCONTROL 100,30 TO 240,50, "TC_threshold", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_sepia-tone", "sepia-tone to image",  "VI_InputSet"
+	elseif(InputView$="shade")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Azimuth: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_azimuth", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Elevation: ", "VI_InputSet"	
+				TEXTCONTROL 100,25 TO 240,45, "TC_elevation", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_shade", "shade to image",  "VI_InputSet"
+	elseif(InputView$="shear")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "X: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_X", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Y: ", "VI_InputSet"	
+				TEXTCONTROL 100,25 TO 240,45, "TC_Y", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_shear", "shear to image",  "VI_InputSet"
+	elseif(InputView$="size")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Width: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_width", "", "", "VI_InputSet"
+			DRAW TEXT 5,45, "Height: ", "VI_InputSet"	
+				TEXTCONTROL 100,30 TO 240,50, "TC_height", "", "", "VI_InputSet"
+			DRAW TEXT 5,75, "Color depth: ", "VI_InputSet"	
+				TEXTCONTROL 100,60 TO 240,70, "TC_colordepth", "", "", "VI_InputSet"
+							
+			BUTTON 2,117 TO 490,137, "BT_size", "size to image",  "VI_InputSet"
+	elseif(InputView$="shave")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "X: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_x", "", "", "VI_InputSet"
+			DRAW TEXT 5,45, "Y: ", "VI_InputSet"	
+				TEXTCONTROL 100,30 TO 240,50, "TC_y", "", "", "VI_InputSet"
+							
+			BUTTON 2,117 TO 490,137, "BT_shave", "shave to image",  "VI_InputSet"	
+	elseif(InputView$="sketch")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "X: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_X", "", "", "VI_InputSet"
+			DRAW TEXT 5,40, "Y: ", "VI_InputSet"	
+				TEXTCONTROL 100,25 TO 240,45, "TC_Y", "", "", "VI_InputSet"
+			DRAW TEXT 5,65, "Angle: ", "VI_InputSet"	
+				TEXTCONTROL 100,50 TO 240,70, "TC_Angle", "", "", "VI_InputSet"
+			
+			BUTTON 2,117 TO 490,137, "BT_sketch", "sketch to image",  "VI_InputSet"
+	elseif(InputView$="solarize")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Factor: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_factor", "", "", "VI_InputSet"
+		
+			BUTTON 2,117 TO 490,137, "BT_solarize", "solarize to image",  "VI_InputSet"
+	elseif(InputView$="spread")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Amount: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_amount", "", "", "VI_InputSet"
+		
+			BUTTON 2,117 TO 490,137, "BT_spread", "spread to image",  "VI_InputSet"
+	elseif(InputView$="swirl")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Degrees: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_degrees", "", "", "VI_InputSet"
+		
+			BUTTON 2,117 TO 490,137, "BT_swirl", "swirl to image",  "VI_InputSet"
+	elseif(InputView$="wave")then
+		VIEW 5,8 TO 498,158,  "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Amplitude: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_amplitude", "", "", "VI_InputSet"
+			DRAW TEXT 5,45, "Wavelength: ", "VI_InputSet"
+				TEXTCONTROL 100,30 TO 240,50, "TC_wavelength", "", "", "VI_InputSet"	
+		
+			BUTTON 2,117 TO 490,137, "BT_wave", "wave to image",  "VI_InputSet"
+	elseif(InputView$="threshold")then
+		VIEW 5,8 TO 498,158,  "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Percent: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_percent", "", "*%", "VI_InputSet"	
+		
+			BUTTON 2,117 TO 490,137, "BT_threshold", "threshold to image",  "VI_InputSet"		
+			
+	elseif(InputView$="wavelet-denoise")then
+		VIEW 5,8 TO 498,158, "VI_InputSet", "BV_Input"
+			DRAW TEXT 5,15, "Threshold: ", "VI_InputSet"
+				TEXTCONTROL 100,0 TO 240,20, "TC_threshold", "", "*%", "VI_InputSet"
+			DRAW TEXT 5,40, "Softness: ", "VI_InputSet"
+				TEXTCONTROL 100,30 TO 240,50, "TC_softness", "", "*%", "VI_InputSet"
+				
+			BUTTON 2,117 TO 490,137, "BT_wavelet-denoise", "wavelet-denoise to image",  "VI_InputSet"
+	endif
+end sub
+
+sub ReadoutDescription()
+	//Description$
+	TEXTEDIT CLEAR "TE_Description"
+	readout=open(ProgramFolder$+"/data/descriptions/"+Description$, "r")
+		x=0
+		i=0
+		while (not EOF(readout))
+			x=x+1
+			dim Description$(x)
+				line input #readout b$		
+				Description$(x)=b$		
+		wend
+	close(readout)
+	for i = 1 to x
+		TEXTEDIT ADD "TE_Description", Description$(i)+"\n"
+	next i	
+end sub
+
+sub SaveFileInfo()
+	SaveFilePath$=""
+	SaveFile$=""
+	dim SplitDir$(1)
+		n = split(File$, SplitDir$(), "/")
+		for i = 1 to n-1
+			if(i=1)then
+				SaveFilePath$=SaveFilePath$
+			else
+				SaveFilePath$=SaveFilePath$+"/"+SplitDir$(i)
+			endif
+		next i
+		SaveFile$=SplitDir$(n)
+end sub
+
+sub DeactivateMenuItems()		
+		//Edit
+		MENU SET  "Other", "Convert", "Disable","VI_Menu2"
+		MENU SET  "Other", "Split image into tiles", "Disable","VI_Menu2"
+		MENU SET  "Edit", "Restore", "Disable","VI_Menu1"
+		MENU SET  "Edit", "Save", "Disable","VI_Menu1"
+		MENU SET  "Edit", "Export As...", "Disable","VI_Menu1"
+		MENU SET  "Edit", "Undo", "Disable","VI_Menu1"
+		MENU SET  "Edit", "Redo", "Disable","VI_Menu1"
+		MENU SET  "View", "Change ratio", "Disable","VI_Menu1"
+		MENU SET "View", "Show full preview image", "Disable", "VI_Menu1"
+		
+		//operators
+		MenuOption$="Deactivate"
+		LoadMenu2()
+		
+		//Templates	
+		x=0
+		i=0
+		ReadTemplatesFiles$=system$("ls -G -1 "+TemplatesFolder$)
+			dim SplitDir$(1)
+				x = split(ReadTemplatesFiles$, SplitDir$(), "\n")
+				for i = 1 to x-1
+					MENU SET "Templates", trim$(SplitDir$(i)), "Disable",  "VI_MenuTemplates"	
+				next i
+end sub
+
+sub ActivateMenuItems()		
+		//Edit
+		MENU SET  "Other", "Convert", "Enable","VI_Menu2"
+		MENU SET  "Other", "Split image into tiles", "Enable","VI_Menu2"
+		MENU SET  "Edit", "Restore", "Enable","VI_Menu1"
+		MENU SET  "Edit", "Save", "Enable","VI_Menu1"
+		MENU SET  "Edit", "Export As...", "Enable","VI_Menu1"
+		if(undo=0)then
+		else
+			MENU SET  "Edit", "Undo", "Enable","VI_Menu1"
+		endif
+		MENU SET  "View", "Change ratio", "Enable","VI_Menu1"
+		MENU SET "View", "Show full preview image", "Enable", "VI_Menu1"	
+	
+		//operators
+		MenuOption$="Activate"
+		LoadMenu2()
+		
+		//Templates	
+		x=0
+		i=0
+		ReadTemplatesFiles$=system$("ls -G -1 "+TemplatesFolder$)
+			dim SplitDir$(1)
+				x = split(ReadTemplatesFiles$, SplitDir$(), "\n")
+				for i = 1 to x-1
+					MENU SET "Templates", trim$(SplitDir$(i)), "Enable",  "VI_MenuTemplates"	
+				next i
+end sub
+
+sub Info()
+	DRAW FLUSH "VI_Info"
+	if(Info$="Ready")then
+		DRAW SET "BGColor", 166, 250, 1, "VI_Info"
+	else
+		DRAW SET "BGColor", 249, 149, 149, "VI_Info"
+	endif	
+	DRAW TEXT 7,15, Info$, "VI_Info"
+end sub
+
+sub MainWindow()
+	WINDOW OPEN screenWidth/2-ScreenSizeWidth/2,screenHeight/2-ScreenSizeHeight/2 to screenWidth/2+ScreenSizeWidth/2,screenHeight/2+ScreenSizeHeight/2 , ProgramID$, ProgramName$
+	WINDOW SET "ImageMagickGUI", "Flags", "Not-H-Resizable, Not-V-Resizable, Not-Zoomable"
+	
+	//LAYOUT "Top, Left", ProgramID$
+	VIEW 0,0 TO 200,20, "VI_Menu1", ProgramID$
+		MENU "App", "About", "Q", "VI_Menu1"
+		MENU "App", "--", "", "VI_Menu1"
+		MENU "App", "Quit", "Q", "VI_Menu1"	
+		
+		MENU "View", "Change ratio", "",  "VI_Menu1"
+		MENU "View", "--", "",  "VI_Menu1"
+		//MENU "View", "Adjust window size to screen size", "",  "VI_Menu1"
+		//MENU "View", "--", "",  "VI_Menu1"
+		MENU "View", "Show full preview image", "",  "VI_Menu1"
+		
+		SUBMENU "Help", "Websites", "BeSly Software Solutions", "",  "VI_Menu1"
+		SUBMENU "Help", "Websites", "BeSly knowledge base", "",  "VI_Menu1"
+		SUBMENU "Help", "Websites", "ImageMagick", "",  "VI_Menu1"
+		SUBMENU "Help", "Forums", "ImageMagick", "",  "VI_Menu1"
+		SUBMENU "Help", "Forums", "Forums BeSly knowledge base", "",  "VI_Menu1"
+		
+		MENU "Edit", "Save", "S", "VI_Menu1"
+		MENU "Edit", "--", "", "VI_Menu1"
+		SUBMENU "Edit", "Export As...", "PDF", "", "VI_Menu1"
+		MENU "Edit", "--", "", "VI_Menu1"
+		MENU "Edit", "Undo", "U", "VI_Menu1"
+		MENU "Edit", "Redo", "R", "VI_Menu1"
+		MENU "Edit", "--", "", "VI_Menu1"
+		MENU "Edit", "Restore", "Ctrl+R", "VI_Menu1"
+		
+		
+	VIEW 201,0 TO 310,20, "VI_MenuTemplates", ProgramID$
+		MENU "Templates", "New", "",  "VI_MenuTemplates"	
+		MENU "Templates", "--", "",  "VI_MenuTemplates"		
+		x=0
+		i=0
+		ReadTemplatesFiles$=system$("ls -G -1 "+TemplatesFolder$)
+			dim SplitDir$(1)
+				x = split(ReadTemplatesFiles$, SplitDir$(), "\n")
+				for i = 1 to x-1
+					MENU "Templates", trim$(SplitDir$(i)), "",  "VI_MenuTemplates"	
+				next i
+			
+	//LAYOUT "Top, Left", ProgramID$
+	VIEW 311,0 TO BitmapSize*2-224+20,20, "VI_Menu2", ProgramID$		
+		MenuOption$="Load"
+		LoadMenu2()	
+	
+	//View Output process
+	//LAYOUT "Top, Left, Right, Bottom", ProgramID$
+	VIEW BitmapSize*2-224+20,0 TO 1024,20, "VI_Info", ProgramID$	
+	
+	//View Input File	
+	//LAYOUT "Left,Top,Right", ProgramID$
+	BOXVIEW 4,25 TO BitmapSize,BitmapSize+50, "BV_ImageLeft", "Dropzone/Input file: ", 2, ProgramID$	
+		VIEW 2.5,2.5 TO BitmapSize+2.5,BitmapSize+2.5, "VI_ImageLeft", "BV_ImageLeft"	
+			//DRAW SET  "BGColor", 0,0,0, "VI_ImageLeft"
+			lenghText = draw get "Text-width", "Drop file here to open", "VI_ImageLeft"
+			DRAW TEXT BitmapSize/2-lenghText/2,BitmapSize/2, "Drop file here to open", "VI_ImageLeft"
+			VIEW DROPZONE "VI_ImageLeft"
+	
+	//View Output File - Preview
+	//LAYOUT "Top,Right", ProgramID$	
+	BOXVIEW BitmapSize+2,25 TO BitmapSize*2,BitmapSize+50, "BV_ImageRight", "Preview", 2, ProgramID$	
+		VIEW 2.5,2.5 TO BitmapSize+2.5,BitmapSize+2.5, "VI_ImageRight", "BV_ImageRight"	
+			//DRAW SET  "BGColor", 0,0,0, "BV_ImageRight"
+			lenghText = draw get "Text-width", "Drop file here to open", "VI_ImageRight"
+			DRAW TEXT BitmapSize/2-lenghText/2,BitmapSize/2, "Drop file here to open", "VI_ImageRight"
+			VIEW DROPZONE "VI_ImageLeft"	
+			VIEW DROPZONE "VI_ImageRight"
+	
+	//View Input informations
+	//LAYOUT "Top, Left", ProgramID$	
+	BOXVIEW 4,BitmapSize+55 TO BitmapSize,BitmapSize+225, "BV_Input", "Input", 2, ProgramID$	
+		VIEW 2.5,2.5 TO BitmapSize+2.5,142, "VI_InputSet", "BV_Input"	
+			//DRAW SET  "BGColor", 0,0,0, "VI_InputSet"	
+	
+	//View descriptions
+	//LAYOUT "Top, Left, Right", ProgramID$	
+	BOXVIEW BitmapSize+2,BitmapSize+55 TO BitmapSize*2,BitmapSize+225, "BV_Description", "Description", 2, ProgramID$	
+		VIEW 2.5,2.5 TO BitmapSize+2.5,162, "VI_Description", "BV_Description"	
+			//DRAW SET  "BGColor", 0,0,0, "VI_Description"	
+			BITMAP 10,10, "BM_Image"
+			
+			TEXTEDIT 2,2 TO 494,138, "TE_Description", 1, "VI_Description"				
+					
+	DeactivateMenuItems()
+end sub
+
+sub TemplateWindow()
+	local templi
+	local templx
+	WINDOW OPEN screenWidth/2-400,screenHeight/2-105 TO screenWidth/2+400,screenHeight/2+105,"VI_NewTemplate", "Create new Template" 
+		WINDOW SET "VI_NewTemplate", "Flags", "Not-Zoomable, Not-Minimizable, Not-H-Resizable, Not-V-Resizable, Not-Resizable"
+			readout=open(ProgramFolder$+"/data/operators", "r")
+				templi=0
+				templx=0
+				while (not EOF(readout))
+					templx=templx+1
+					line input #readout templb$
+					dim templd$(templx)
+						templd$(templx)=templb$
+						dim elements$(1)
+							numElements = split(templd$(templx), elements$(),"|")
+							for templi = 1 to readout
+								MENU SET trim$(elements$(1)), trim$(elements$(2)), "Remove",  "VI_NewTemplate"   //Stupid option, but without the menu entries are doubled
+								MENU elements$(1), elements$(2), "", "VI_NewTemplate"
+								MENU SET trim$(elements$(1)), trim$(elements$(2)), "Disable",  "VI_NewTemplate"
+							next templi
+				wend
+			
+			TEXTCONTROL 10,25 TO 600,50, "TC_TemplateName", "Template name:          ", "",  "VI_NewTemplate"
+			
+			DROPBOX 620,25 TO 792,50, "DB_ConvertMogrify", "Select:          ", "VI_NewTemplate"
+				DROPBOX ADD "DB_ConvertMogrify", "convert"
+				DROPBOX ADD "DB_ConvertMogrify", "mogrify"
+				
+			TEXTEDIT 10,55 TO 790,145, "TE_TemplateString", 1, "VI_NewTemplate"
+				TEXTEDIT SET "TE_TemplateString", "editable", false
+				
+			TEXTCONTROL 10,150 TO 792,170, "TC_Inputfiles", "input file/files:          ", "",  "VI_NewTemplate"
+				OPTION SET "TC_Inputfiles", "Enabled", false
+									
+			BUTTON 590,180 TO 790,200, "BT_CreateTemplate", "Create Template",  "VI_NewTemplate"
+				OPTION SET "BT_CreateTemplate", "Enabled", false 
+end sub
+
+sub LoadMenu2()
+	fileload$=ProgramFolder$+"/data/menu"
+	readout=open(fileload$, "r")
+	x=0
+	while (not EOF(readout))
+		x=x+1
+		line input #readout b$
+		dim d$(x)
+			d$(x)=b$
+			dim elements$(1)
+				numElements = split(d$(x), elements$(),"|")
+				for i = 1 to readout
+					if(numElements=2)then
+						if(MenuOption$="Load")then
+							MENU elements$(1), elements$(2), "", "VI_Menu2"
+						elseif(MenuOption$="Activate")then
+							MENU SET  elements$(1), elements$(2), "Enable","VI_Menu2"
+						elseif(MenuOption$="Deactivate")then
+							MENU SET  elements$(1), elements$(2), "Disable","VI_Menu2"
+						endif
+					elseif(numElements=3)then
+						if(MenuOption$="Load")then
+							SUBMENU elements$(1), elements$(2), elements$(3), "", "VI_Menu2"
+						elseif(MenuOption$="Activate")then
+							MENU SET  elements$(1), elements$(2), "Enable","VI_Menu2"						
+						elseif(MenuOption$="Deactivate")then
+							MENU SET  elements$(1), elements$(2), "Disable","VI_Menu2"
+						endif
+					elseif(numElements=4)then
+						if(MenuOption$="Load")then
+							if(trim$(elements$(3))="")then
+								MENU SET  elements$(1), elements$(2), "Enable","VI_Menu2"
+							else
+								SUBMENU elements$(1), elements$(2), elements$(3), "", "VI_Menu2"
+							endif
+						endif
+					endif
+				next i
+	wend
+	close(readout)
+end sub
+
+
+//Check if a file or folder already exisits
+sub IfExists(filename$)
+     return not system("test -e "+filename$)
+end sub
